@@ -1,6 +1,6 @@
 # PortAu SJPA 🐾
 
-> Aplicativo PWA para gestão de animais e baias da ONG SJPA.
+> Aplicativo para gestão de animais e baias da ONG SJPA.
 
 ---
 
