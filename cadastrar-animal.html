@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortAu SJPA - Cadastrar Pet</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Varela+Round&display=swap" rel="stylesheet">
+</head>
+<body class="main-app-body">
+
+    <div class="app-container">
+        <header class="page-header">
+            <a href="home.html" class="header-icon back-button">&#x2190;</a>
+            <div class="header-logo">
+                <img src="images/logo.png" alt="Logo PortAu SJPA">
+            </div>
+            <button class="header-icon menu-button">
+                <img src="images/menu-aberto.png" alt="Ícone Menu">
+            </button>
+        </header>
+
+        <main class="main-content form-page">
+            <form action="#" class="pet-form">
+                
+                <div class="form-group">
+                    <label for="pet-photo-input">Foto do pet</label>
+                    <label for="pet-photo-input" class="pet-photo-upload">
+                        <span>Insira uma foto do pet</span>
+                    </label>
+                    <input type="file" id="pet-photo-input" class="hidden-file-input">
+                </div>
+                
+                <div class="form-group">
+                    <label for="pet-name">Nome</label>
+                    <input type="text" id="pet-name" placeholder="Nome do pet">
+                </div>
+                
+                <div class="form-group">
+                    <label for="pet-sex">Sexo</label>
+                    <input type="text" id="pet-sex" placeholder="Sexo do pet">
+                </div>
+
+                <div class="form-group">
+                    <label for="pet-race">Raça</label>
+                    <input type="text" id="pet-race" placeholder="Raça do pet">
+                </div>
+
+                <div class="form-group">
+                    <label for="pet-fur">Pelagem</label>
+                    <input type="text" id="pet-fur" placeholder="Pelo do pet">
+                </div>
+
+                <div class="form-group">
+                    <label for="pet-size">Porte</label>
+                    <input type="text" id="pet-size" placeholder="Porte do pet">
+                </div>
+                
+                <div class="form-group">
+                    <label for="pet-species">Espécie</label>
+                    <input type="text" id="pet-species" placeholder="Espécie do pet">
+                </div>
+
+                <div class="form-group">
+                    <label for="pet-temperament">Gênio</label>
+                    <input type="text" id="pet-temperament" placeholder="Gênio do pet">
+                </div>
+
+                <div class="form-group">
+                    <label for="pet-bay">Baia</label>
+                    <input type="text" id="pet-bay" placeholder="Baia do pet">
+                </div>
+
+                <div class="form-group">
+                    <label for="pet-birthdate">Data nascimento</label>
+                    <input type="text" id="pet-birthdate" placeholder="XX/XX/XXXX">
+                </div>
+
+                <div class="form-group">
+                    <label for="pet-collection-date">Data recolhimento</label>
+                    <input type="text" id="pet-collection-date" placeholder="XX/XX/XXXX">
+                </div>
+
+                <div class="form-group">
+                    <label for="pet-obs">Observações</label>
+                    <textarea id="pet-obs" rows="5" placeholder="Informações adicionais do animal..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-salvar">SALVAR</button>
+            </form>
+        </main>
+    </div>
+
+    <div id="side-menu-container" class="menu-container">
+        <nav class="menu-panel">
+            <div class="menu-header">
+                <img src="images/logo.png" alt="Logo PortAu SJPA">
+            </div>
+            
+            <div class="menu-options">
+                <a href="perfil.html" class="menu-button-item">MEU PERFIL</a>
+                <a href="suporte.html" class="menu-button-item">SUPORTE PORTAU</a>
+            </div>
+
+            <div class="menu-footer">
+                <a href="index.html" class="menu-logout-button">SAIR DO PORTAU</a>
+            </div>
+        </nav>
+    </div>
+    <script src="js/menu.js"></script>
+
+</body>
+</html>

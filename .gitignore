@@ -1,0 +1,18 @@
+# Arquivos do Sistema Operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos de log
+*.log
+npm-debug.log*
+
+# Pastas de dependências (muito importante para o futuro)
+node_modules/
+
+# Arquivos de ambiente com dados sensíveis (para o futuro)
+.env
+.env.local
+
+# Pastas de editores de código
+.vscode/
+.idea/

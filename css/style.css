@@ -1,0 +1,694 @@
+/* Estilo geral */
+body {
+    margin: 0;
+    font-family: 'Varela Round', sans-serif;
+    background-color: #f0f2f5; /* Fundo cinza claro fora do container */
+    display: flex; /* Habilita o Flexbox */
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center; /* Centraliza verticalmente */
+    min-height: 100vh; /* Garante que o corpo ocupe 100% da altura da tela */
+    box-sizing: border-box;
+    padding: 15px; /* Adiciona um respiro nas laterais em telas menores */
+}
+
+/* Container principal */
+.login-container {
+    background-color: #3a9a6c;
+    width: 100%;
+    max-width: 400px;
+    padding: 40px 30px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 20px;
+    text-align: center;
+    color: white;
+    box-sizing: border-box;
+    position: relative; 
+}
+
+/* Estilo da logo */
+.logo-container {
+    margin-bottom: 20px;
+}
+.logo-container img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: white;
+    padding: 5px;
+    border: 3px solid #FFF;
+}
+
+/* Títulos */
+h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2.2em;
+    margin-top: 10px;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+}
+
+/* Campos de texto */
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+.input-group label {
+    font-family: 'Fredoka One', cursive;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1.1em;
+}
+.input-group input {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+/* Botão */
+.btn-login {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 25px;
+    background-color: white;
+    color: black;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2em;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+.btn-login:hover {
+    background-color: #f0f0f0;
+    transform: scale(1.02);
+}
+
+/* Links inferiores */
+.links-container {
+    margin-top: 25px;
+}
+.links-container a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    font-family: 'Fredoka One', cursive;
+    font-size: 0.9em;
+    margin-top: 15px;
+    transition: opacity 0.3s;
+}
+.links-container a:hover {
+    opacity: 0.8;
+}
+
+/* Seta de voltar */
+.back-arrow {
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    font-size: 2em;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* --- Estilos para a Tela de Cadastro --- */
+
+/* Título de seção como "Endereço principal" */
+.section-title {
+    font-family: 'Varela Round', sans-serif;
+    font-size: 1.1em;
+    color: #e0e0e0;
+    text-align: left;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    font-weight: normal;
+}
+
+/* Container para o input com ícone */
+.input-with-icon {
+    position: relative;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+/* Estilo do ícone à esquerda dentro do campo */
+.input-icon {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    opacity: 0.6;
+}
+
+/* Ajuste no input para dar espaço ao ícone */
+.input-with-icon input {
+    padding-left: 55px; /* Espaço para o ícone */
+    width: 100%;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+/* Ícone de ver/ocultar senha à direita */
+.password-toggle {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+/* Linha do formulário para agrupar campos (CEP e Número) */
+.form-row {
+    display: flex;
+    gap: 15px; /* Espaçamento entre os campos */
+}
+
+/* Ajuste para remover a margem inferior do último campo na linha */
+.form-row .input-with-icon {
+    margin-bottom: 15px;
+}
+
+/* Remove a margem superior do formulário para aproximar do logo */
+.signup-form {
+    margin-top: -15px;
+}
+
+/* --- Estilos para a Tela Principal --- */
+
+/* Ajuste no body para telas com navegação fixa */
+.main-app-body {
+    background-color: #e0e0e0; /* Fundo cinza claro geral */
+    padding: 0; /* Remove o padding do body principal */
+}
+
+.app-container {
+    width: 100%;
+    max-width: 420px; /* Largura máxima para a tela do app */
+    margin: 0 auto;
+    background-color: #FFF;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* Cabeçalho */
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px;
+    background-color: #3a9a6c; /* CORRIGIDO para o verde padrão */
+    /* A borda inferior foi removida pois não é mais necessária */
+}
+
+.logo-header {
+    width: 45px;
+    height: 45px;
+}
+
+.logo-header img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.search-container {
+    flex-grow: 1;
+    margin: 0 15px;
+    position: relative;
+}
+
+.search-bar {
+    width: 100%;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    padding: 8px 40px; /* Espaço para os ícones */
+    box-sizing: border-box;
+    font-size: 0.9em;
+}
+
+.search-icon, .filter-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+}
+
+.search-icon {
+    left: 15px;
+}
+
+.filter-icon {
+    right: 15px;
+    cursor: pointer;
+}
+
+.menu-button {
+    background: none;
+    border: 1px solid white; /* CORRIGIDO para a borda ser branca */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.menu-button img{
+    width: 20px;
+    /* Adicionamos um filtro para o ícone do menu ficar branco também */
+    filter: brightness(0) invert(1);
+}
+
+/* Conteúdo Principal */
+.main-content {
+    padding: 15px;
+    flex-grow: 1;
+    /* O padding-bottom grande foi removido daqui */
+}
+
+.btn-principal {
+    display: block; /* Faz o link ocupar a linha inteira como um botão */
+    width: 100%;
+    background-color: #FFF;
+    border: 2px solid #333;
+    border-radius: 10px;
+    padding: 12px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2em;
+    cursor: pointer;
+    margin-bottom: 20px;
+    box-sizing: border-box; /* Garante que o padding e a borda não aumentem a largura total */
+    
+    /* --- CORREÇÕES PRINCIPAIS AQUI --- */
+    text-align: center;      /* Centraliza o texto dentro do botão */
+    text-decoration: none;   /* Remove o sublinhado padrão dos links */
+    color: #333;             /* Define a cor do texto para preto/cinza escuro */
+}
+
+/* Regra ADICIONAL para garantir que a cor não mude após a visita */
+.btn-principal:visited {
+    color: #333; /* Mantém a mesma cor de texto para links visitados */
+}
+
+/* Cards de Animais */
+.animal-card {
+    display: flex;
+    background-color: #f8f9fa;
+    border-radius: 15px;
+    padding: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    align-items: center;
+}
+
+.animal-photo {
+    width: 100px;
+    height: 100px;
+    border-radius: 10px;
+    object-fit: cover;
+    margin-right: 15px;
+}
+
+.animal-info p {
+    margin: 0 0 5px 0;
+    font-size: 0.95em;
+}
+
+.animal-info p:last-child {
+    margin-bottom: 0;
+}
+
+/* Navegação Inferior */
+.bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 420px; /* Mesma largura do container do app */
+    background-color: #2a7e5a; /* Verde um pouco mais escuro */
+}
+
+.nav-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    padding: 10px 0;
+    color: white;
+    text-decoration: none;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.1em;
+}
+
+.nav-button.active {
+    background-color: #3a9a6c; /* Verde principal para o botão ativo */
+}
+
+.nav-button img {
+    width: 30px;
+    height: 30px;
+    margin-bottom: 5px;
+}
+
+/* --- Estilos para a Tela de Cadastro de Pet (Novo Layout) --- */
+
+/* Cabeçalho específico para páginas internas */
+/* --- Cabeçalho específico para páginas internas (VERSÃO CORRIGIDA) --- */
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #3a9a6c;
+    /* --- CORREÇÃO APLICADA AQUI --- */
+    position: relative; /* Garante o contexto de posicionamento */
+    z-index: 20;       /* Coloca o cabeçalho na camada de cima */
+}
+
+.header-logo {
+    width: 45px;
+    height: 45px;
+    background-color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+}
+
+.header-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Garante que a imagem se ajuste ao espaço */
+}
+
+.header-icon {
+    background: none;
+    border: 1px solid white;
+    color: white;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    font-size: 1.5em;
+}
+
+.header-icon img {
+    width: 20px;
+}
+
+/* Garante que o conteúdo não fique atrás do cabeçalho */
+.form-page {
+    background-color: #f7f3e9; /* Fundo cor creme/bege */
+    border-radius: 25px 25px 0 0;
+    margin-top: -20px; /* Sobe o conteúdo para ficar por baixo do header */
+    position: relative;
+    z-index: 10;
+}
+
+/* Formulário do Pet */
+.pet-form {
+    padding-top: 25px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #3a9a6c; /* Labels verdes */
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.1em;
+}
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #dcdcdc;
+    border-radius: 25px;
+    font-size: 1em;
+    box-sizing: border-box;
+    background-color: white;
+}
+.form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+
+.pet-photo-upload {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 140px;
+    border: 2px solid #dcdcdc;
+    border-radius: 15px;
+    cursor: pointer;
+    background-color: #ededed;
+    color: #a0a0a0;
+    text-align: center;
+    font-family: 'Varela Round', sans-serif;
+}
+.pet-photo-upload span {
+    padding: 10px;
+}
+
+/* Botão de salvar com a cor verde */
+.btn-salvar {
+    width: 100%;
+    background-color: #3a9a6c;
+    border: none;
+    border-radius: 25px;
+    padding: 15px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2em;
+    color: white;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.hidden-file-input {
+    display: none;
+}
+
+.with-bottom-nav {
+    padding-bottom: 90px;
+}
+
+/* --- Estilos para o Menu Lateral Deslizante --- */
+
+/* O container que cobre a tela inteira (fundo semi-transparente) */
+.menu-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fundo preto com 50% de opacidade */
+    z-index: 1000; /* Garante que o menu fique acima de todo o resto */
+    
+    /* Escondido por padrão */
+    opacity: 0;
+    visibility: hidden;
+    
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* Estado visível do container */
+.menu-container.is-open {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* O painel do menu que desliza da direita */
+.menu-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 85%;
+    max-width: 320px;
+    height: 100%;
+    background-color: #f0f2f5; /* Cinza claro, como no print */
+    box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+    
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+
+    /* Escondido fora da tela por padrão */
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Estado visível do painel (desliza para dentro) */
+.menu-container.is-open .menu-panel {
+    transform: translateX(0);
+}
+
+/* Cabeçalho do menu com a logo */
+.menu-header {
+    text-align: center;
+    padding-bottom: 30px;
+}
+.menu-header img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: white;
+    border: 2px solid #3a9a6c;
+}
+
+/* Corpo principal do menu com os botões */
+.menu-options {
+    flex-grow: 1; /* Empurra o rodapé para baixo */
+}
+
+.menu-button-item {
+    display: block;
+    background-color: white;
+    color: #333;
+    text-decoration: none;
+    text-align: center;
+    padding: 15px;
+    border-radius: 20px;
+    margin-bottom: 15px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.1em;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Botão de sair no rodapé do menu */
+.menu-logout-button {
+    display: block;
+    background-color: #e57373; /* Tom de vermelho/rosa */
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    padding: 15px;
+    border-radius: 20px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.1em;
+}
+
+/* --- Estilos para a Tela de Perfil --- */
+
+.profile-grid, .address-grid {
+    display: grid;
+    gap: 15px; /* Espaço entre os elementos */
+    align-items: flex-start;
+}
+
+.profile-grid {
+    /* Divide em 1 parte para a foto, 1.5 para os campos */
+    grid-template-columns: 1fr 1.5fr; 
+}
+
+.address-grid {
+    /* Divide em 2 colunas de tamanho igual */
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.form-section-title {
+    color: #3a9a6c;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2em;
+    margin-top: 25px;
+    margin-bottom: 5px;
+    /* Remove a margem do .form-group para o título ficar mais perto */
+    text-align: left;
+}
+
+/* Grupo de botões no final */
+.button-group {
+    margin-top: 25px;
+}
+
+/* Botão secundário (Alterar Senha) */
+.btn-secondary {
+    width: 100%;
+    background-color: #e57373; /* Tom de vermelho/rosa */
+    border: none;
+    border-radius: 25px;
+    padding: 15px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2em;
+    color: white;
+    cursor: pointer;
+    margin-bottom: 15px; /* Espaço entre os botões */
+}
+
+/* Estilo para o botão desativado */
+.btn-secondary:disabled {
+    background-color: #e0e0e0; /* Cinza claro */
+    color: #a0a0a0; /* Cor do texto apagada */
+    cursor: not-allowed; /* Mostra o cursor de "não permitido" */
+}
+
+/* --- Estilos para a Tela de Suporte --- */
+
+.support-page {
+    text-align: center;
+    padding-top: 40px;
+}
+
+.support-item {
+    margin-bottom: 30px;
+}
+
+.support-item label {
+    display: block;
+    color: #3a9a6c;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.support-button {
+    display: inline-block;
+    width: 80%;
+    max-width: 300px;
+    padding: 15px;
+    border: 1px solid #dcdcdc;
+    border-radius: 25px;
+    font-size: 1.1em;
+    font-family: 'Fredoka One', cursive;
+    box-sizing: border-box;
+    background-color: white;
+    color: #333;
+    text-decoration: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Estilo para o botão desativado */
+.support-button:disabled {
+    background-color: #ededed;
+    color: #c0c0c0;
+    cursor: not-allowed;
+    box-shadow: none;
+}

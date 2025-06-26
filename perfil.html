@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortAu SJPA - Meu Perfil</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Varela+Round&display=swap" rel="stylesheet">
+</head>
+<body class="main-app-body">
+
+    <div class="app-container">
+        <header class="page-header">
+            <a href="home.html" class="header-icon back-button">&#x2190;</a>
+            <div class="header-logo">
+                <img src="images/logo.png" alt="Logo PortAu SJPA">
+            </div>
+            <button class="header-icon menu-button">
+                <img src="images/menu-aberto.png" alt="Ícone Menu">
+            </button>
+        </header>
+
+        <main class="main-content form-page">
+            <form action="#" class="pet-form">
+                
+                <div class="profile-grid">
+                    <div class="form-group">
+                        <label for="user-photo">Foto do usuário</label>
+                        <label for="user-photo-input" class="pet-photo-upload">
+                            <span>Alterar foto</span>
+                        </label>
+                        <input type="file" id="user-photo-input" class="hidden-file-input">
+                    </div>
+                    <div class="profile-fields">
+                        <div class="form-group">
+                            <label for="user-fullname">Nome completo</label>
+                            <input type="text" id="user-fullname">
+                        </div>
+                        <div class="form-group">
+                            <label for="user-username">Usuário</label>
+                            <input type="text" id="user-username">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="user-email">Email</label>
+                    <input type="email" id="user-email">
+                </div>
+
+                <h2 class="form-section-title">Endereço principal</h2>
+                <div class="address-grid">
+                    <div class="form-group">
+                        <label for="user-street">Rua</label>
+                        <input type="text" id="user-street">
+                    </div>
+                    <div class="form-group">
+                        <label for="user-number">Número</label>
+                        <input type="text" id="user-number">
+                    </div>
+                    <div class="form-group">
+                        <label for="user-neighborhood">Bairro</label>
+                        <input type="text" id="user-neighborhood">
+                    </div>
+                    <div class="form-group">
+                        <label for="user-cep">CEP</label>
+                        <input type="text" id="user-cep">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="user-complement">Complemento</label>
+                    <input type="text" id="user-complement">
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn-secondary" disabled>ALTERAR SENHA</button>
+                    <button type="submit" class="btn-salvar">SALVAR</button>
+                </div>
+
+            </form>
+        </main>
+    </div>
+    
+    <div id="side-menu-container" class="menu-container">
+        <nav class="menu-panel">
+            <div class="menu-header"><img src="images/logo.png" alt="Logo PortAu SJPA"></div>
+            <div class="menu-options">
+                <a href="perfil.html" class="menu-button-item">MEU PERFIL</a>
+                <a href="suporte.html" class="menu-button-item">SUPORTE PORTAU</a>
+            </div>
+            <div class="menu-footer"><a href="index.html" class="menu-logout-button">SAIR DO PORTAU</a></div>
+        </nav>
+    </div>
+    <script src="js/menu.js"></script>
+
+</body>
+</html>
