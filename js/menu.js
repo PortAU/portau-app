@@ -35,14 +35,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// --- REGISTRO DO SERVICE WORKER (VERSÃO ATUALIZADA) ---
-
-// Verifica se o navegador suporta Service Workers
+// --- REGISTRO DO SERVICE WORKER (VOLTANDO PARA A RAIZ) ---
 if ('serviceWorker' in navigator) {
-    // Usa o evento 'load' para garantir que o registro não atrase o carregamento da página
     window.addEventListener('load', () => {
-        // Caminho atualizado para o novo local do arquivo e definição do escopo
-        navigator.serviceWorker.register('/js/sw.js', { scope: '/' })
+        // O caminho volta a ser o da raiz e a opção de escopo é removida, pois se torna o padrão.
+        navigator.serviceWorker.register('/sw.js') 
             .then(registration => {
                 console.log('Service Worker registrado com sucesso! Escopo:', registration.scope);
             })

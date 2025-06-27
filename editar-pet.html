@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <!-- ... (mantenha o mesmo head das outras páginas) ... -->
+    <title>Editar Pet - PortAu SJPA</title>
+</head>
+<body class="main-app-body">
+    <div class="app-container">
+        <header class="page-header">
+            <a href="home.html" class="header-icon back-button">
+                <img src="images/seta.png" alt="Voltar para a página inicial" class="icon-img">
+            </a>
+            <div class="header-logo">
+                <img src="images/logo.png" alt="Logo PortAu SJPA">
+            </div>
+        </header>
+
+        <main class="main-content form-page">
+            <form id="edit-pet-form" class="pet-form">
+                <!-- Campos idênticos ao cadastrar-pet.html, mas com IDs iguais -->
+                <div class="form-group">
+                    <label for="pet-name">Nome</label>
+                    <input type="text" id="pet-name" placeholder="Nome do pet">
+                </div>
+                <!-- ... (todos os outros campos) ... -->
+                <button type="submit" class="btn-salvar">ATUALIZAR</button>
+                <button type="button" id="delete-pet" class="btn-deletar">DELETAR</button>
+            </form>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/editar-pet.js"></script>
+</body>
+</html>

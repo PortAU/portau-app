@@ -692,3 +692,85 @@ h1 {
     cursor: not-allowed;
     box-shadow: none;
 }
+
+/* Estilo para os cards clicáveis */
+.animal-card {
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.animal-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+
+/* Botão de deletar */
+.btn-deletar {
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    margin-top: 10px;
+}
+
+.btn-deletar:hover {
+    background-color: #cc0000;
+}
+
+/* Estilo específico para páginas de edição */
+.form-page .btn-deletar {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+.form-page .btn-salvar {
+    margin-bottom: 10px;
+}
+
+
+/* Mensagens */
+.no-data, .error {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+/* Cards melhorados */
+
+.card-actions {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+}
+
+.btn-editar {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.empty-state, .error-state {
+  text-align: center;
+  padding: 20px;
+}
+
+.empty-state img {
+  width: 100px;
+  opacity: 0.6;
+}
+
+.error-state button {
+  background: #ff4444;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
