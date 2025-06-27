@@ -51,3 +51,14 @@ if ('serviceWorker' in navigator) {
             });
     });
 }
+
+// Adiciona logout ao menu
+const logoutButton = document.querySelector('.menu-logout-button');
+if (logoutButton) {
+  logoutButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    auth.signOut().then(() => {
+      window.location.href = 'index.html';
+    });
+  });
+}
