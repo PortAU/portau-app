@@ -707,10 +707,16 @@ h1 {
 
 /* Botão de deletar */
 .btn-deletar {
+    width: 100%;
     background-color: #ff4444;
-    color: white;
     border: none;
-    margin-top: 10px;
+    border-radius: 25px;
+    padding: 15px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2em;
+    color: white;
+    cursor: pointer;
+    margin-top: 15px;
 }
 
 .btn-deletar:hover {

@@ -45,17 +45,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = document.createElement('div');
         card.className = 'animal-card';
         card.innerHTML = `
-          <div class="animal-info">
-            <h3>${data.nome || 'Sem nome'}</h3>
-            ${isBaiasPage ? `
-              <p>Porte: ${data.porte || '-'}</p>
-              <p>Gênio: ${data.genio || '-'}</p>
-            ` : `
-              <p>Espécie: ${data.especie || '-'}</p>
-              <p>Raça: ${data.raca || '-'}</p>
-            `}
-          </div>
-        `;
+  <div class="animal-info">
+    <h3>${data.nome || 'Sem nome'}</h3>
+    ${isBaiasPage ? `
+      <p>Porte: ${data.porte || '-'}</p>
+      <p>Gênio: ${data.genio || '-'}</p>
+    ` : `
+      <p>Espécie: ${data.especie || '-'}</p>
+      <p>Raça: ${data.raca || '-'}</p>
+    `}
+  </div>
+`;
+
+        // Redireciona ao clicar no card (somente se não for a tela de baias)
+        if (!isBaiasPage) {
+          card.style.cursor = 'pointer';
+          card.addEventListener('click', () => {
+            window.location.href = `editar-pet.html?id=${itemId}`;
+          });
+        }
         container.appendChild(card);
       });
     }, (error) => {
