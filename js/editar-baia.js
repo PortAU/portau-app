@@ -1,87 +1,91 @@
+// js/editar-baia.js
 document.addEventListener('DOMContentLoaded', () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const baiaId = urlParams.get('id');
-
-  firebase.auth().onAuthStateChanged((user) => {
-    if (!user) {
-      alert('Usuário não autenticado.');
-      window.location.href = 'index.html';
-      return;
-    }
+    const auth = firebase.auth();
+    const database = firebase.database();
     
-    const userId = user.uid;
-    const form = document.getElementById('edit-baia-form');
+    // --- Seleciona os elementos do formulário pelos IDs ---
+    const form = document.getElementById('baia-form');
+    const submitButton = document.getElementById('submit-button');
+    const nomeBaiaField = document.getElementById('baia-name');
+    const porteField = document.getElementById('baia-size');
+    const genioField = document.getElementById('baia-temperament');
+    const idadeField = document.getElementById('baia-age');
 
-    // Carrega os dados da baia
-    firebase.database().ref(`user-baias/${userId}/${baiaId}`).once('value')
-      .then((snapshot) => {
-        const baiaData = snapshot.val();
-        if (baiaData) {
-          document.getElementById('baia-name').value = baiaData.nome || '';
-          document.getElementById('baia-size').value = baiaData.porte || '';
-          document.getElementById('baia-temperament').value = baiaData.genio || '';
-          document.getElementById('baia-age').value = baiaData.idade || '';
-        }
-      })
-      .catch(error => {
-        alert('Erro ao carregar dados da baia: ' + error.message);
-      });
+    // --- Pega o ID da Baia da URL ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const baiaId = urlParams.get('id');
 
-    // Atualiza a baia
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
+    if (!baiaId) {
+        alert("ID da baia não encontrado. Redirecionando...");
+        window.location.href = 'baias.html';
+        return;
+    }
 
-      const updatedData = {
-        nome: form.querySelector('#baia-name').value,
-        porte: form.querySelector('#baia-size').value,
-        genio: form.querySelector('#baia-temperament').value,
-        idade: form.querySelector('#baia-age').value,
-        userId: userId,
-        updatedAt: firebase.database.ServerValue.TIMESTAMP
-      };
+    let userUid = null;
 
-      const updates = {};
-      updates[`/baias/${baiaId}`] = updatedData;
-      updates[`/user-baias/${userId}/${baiaId}`] = updatedData;
-
-      firebase.database().ref().update(updates)
-        .then(() => {
-          alert('Baia atualizada com sucesso!');
-          window.location.href = 'baias.html';
-        })
-        .catch(error => {
-          alert('Erro ao atualizar: ' + error.message);
-        });
-    });
-
-    // Deleta a baia
-    document.getElementById('delete-baia').addEventListener('click', () => {
-      if (confirm('Tem certeza que deseja deletar esta baia? Todos os animais relacionados serão desvinculados!')) {
-
-        // Atualiza todos os pets vinculados a esta baia para remover a referência
-        firebase.database().ref(`user-pets/${userId}`).orderByChild('baia').equalTo(baiaId).once('value')
-          .then((snapshot) => {
-            const updates = {};
-
-            snapshot.forEach((childSnapshot) => {
-              updates[`user-pets/${userId}/${childSnapshot.key}/baia`] = null;
-              updates[`pets/${childSnapshot.key}/baia`] = null;
+    // --- Verifica o usuário logado ---
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            userUid = user.uid;
+            
+            // --- MODO DE EDIÇÃO: Carrega os dados existentes ---
+            console.log(`Modo de edição. Carregando baia ID: ${baiaId}`);
+            // Muda o texto do botão para "ATUALIZAR"
+            submitButton.textContent = "ATUALIZAR";
+            
+            const baiaRef = database.ref(`user-baias/${userUid}/${baiaId}`);
+            
+            // Busca os dados da baia específica
+            baiaRef.once('value').then((snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    
+                    // --- Preenche o formulário com os dados ---
+                    nomeBaiaField.value = data.nomeBaia || '';
+                    porteField.value = data.porte || '';
+                    genioField.value = data.genio || '';
+                    idadeField.value = data.idade || '';
+                } else {
+                    alert("Baia não encontrada.");
+                    window.location.href = 'baias.html';
+                }
+            }).catch(error => {
+                console.error("Erro ao carregar dados da baia:", error);
+                alert("Erro ao carregar dados.");
             });
 
-            // Deleta a baia
-            updates[`/baias/${baiaId}`] = null;
-            updates[`/user-baias/${userId}/${baiaId}`] = null;
-
-            return firebase.database().ref().update(updates);
-          })
-          .then(() => {
-            alert('Baia deletada com sucesso!');
-            window.location.href = 'baias.html';
-          })
-          .catch(error => {
-            alert('Erro ao deletar: ' + error.message);
-          });
-      }
+        } else {
+            console.log("Usuário não logado. O auth.js deve redirecionar.");
+        }
     });
-  });
+
+    // --- Lógica de Envio do Formulário (Atualizar) ---
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        
+        if (!userUid) {
+            alert("Você não está logado. Faça login novamente.");
+            return;
+        }
+        
+        // Coleta os dados ATUALIZADOS do formulário
+        const baiaData = {
+            nomeBaia: nomeBaiaField.value,
+            porte: porteField.value,
+            genio: genioField.value,
+            idade: idadeField.value
+            // adicione fotoUrl aqui quando implementar o upload
+        };
+
+        // Salva os dados usando .update()
+        database.ref(`user-baias/${userUid}/${baiaId}`).update(baiaData)
+            .then(() => {
+                alert("Baia atualizada com sucesso!");
+                window.location.href = 'baias.html'; // Volta para a lista
+            })
+            .catch(error => {
+                console.error("Erro ao atualizar baia:", error);
+                alert("Erro ao atualizar baia.");
+            });
+    });
 });

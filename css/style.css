@@ -724,13 +724,7 @@ h1 {
 }
 
 /* Estilo específico para páginas de edição */
-.form-page .btn-deletar {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 16px;
-    margin-top: 20px;
-}
+
 
 .form-page .btn-salvar {
     margin-bottom: 10px;
