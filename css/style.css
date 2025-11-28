@@ -333,41 +333,7 @@ h1 {
     margin-bottom: 0;
 }
 
-/* Navegação Inferior */
-.bottom-nav {
-    display: flex;
-    justify-content: space-around;
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 420px; /* Mesma largura do container do app */
-    background-color: #2a7e5a; /* Verde um pouco mais escuro */
-}
 
-.nav-button {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex-grow: 1;
-    padding: 10px 0;
-    color: white;
-    text-decoration: none;
-    font-family: 'Fredoka One', cursive;
-    font-size: 1.1em;
-}
-
-.nav-button.active {
-    background-color: #3a9a6c; /* Verde principal para o botão ativo */
-}
-
-.nav-button img {
-    width: 30px;
-    height: 30px;
-    margin-bottom: 5px;
-}
 
 /* --- Estilos para a Tela de Cadastro de Pet (Novo Layout) --- */
 
@@ -773,4 +739,407 @@ h1 {
   border-radius: 4px;
   cursor: pointer;
   margin-top: 10px;
+}
+
+/* ==== BARRA INFERIOR FINAL ===== */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  max-width: 420px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 75px;
+  background: #3a9a6c;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  z-index: 999;
+}
+
+.nav-button {
+  text-decoration: none;
+  color: white;
+  font-family: "Varela Round", sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  opacity: 0.7;
+  transition: 0.2s;
+}
+
+.nav-button img {
+  width: 30px;
+  filter: brightness(0) invert(1);
+}
+
+.nav-button.active,
+.nav-button:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Garante que o conteúdo não fique atrás da barra */
+.with-bottom-nav {
+  padding-bottom: 100px;
+}
+
+/* --- ESTILOS PARA A SEÇÃO DE ESTOQUE --- */
+
+.page-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.8em;
+    text-align: center;
+    color: #333;
+    margin: 20px 0;
+}
+
+.tab-navigation {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tab-button {
+    flex: 1;
+    max-width: 180px;
+    padding: 12px 20px;
+    border: 2px solid #3a9a6c;
+    border-radius: 25px;
+    background-color: white;
+    color: #3a9a6c;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tab-button.active {
+    background-color: #3a9a6c;
+    color: white;
+}
+
+.estoque-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.btn-estoque {
+    width: 100%;
+    background-color: white;
+    border: 2px solid #333;
+    border-radius: 25px;
+    padding: 15px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2em;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+.estoque-section {
+    background-color: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.estoque-section.hidden {
+    display: none;
+}
+
+.section-subtitle {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.5em;
+    text-align: center;
+    color: #3a9a6c;
+    margin-bottom: 20px;
+}
+
+.estoque-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.estoque-form .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.estoque-form label {
+    color: #3a9a6c;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1em;
+    margin-bottom: 8px;
+}
+
+.estoque-form input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #dcdcdc;
+    border-radius: 25px;
+    font-size: 1em;
+    box-sizing: border-box;
+    background-color: white;
+}
+
+.btn-action {
+    width: 100%;
+    background-color: #3a9a6c;
+    border: none;
+    border-radius: 25px;
+    padding: 15px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2em;
+    color: white;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.excluir-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.btn-excluir-confirmar,
+.btn-excluir-cancelar {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    border-radius: 25px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.1em;
+    cursor: pointer;
+}
+
+.btn-excluir-confirmar {
+    background-color: #3a9a6c;
+    color: white;
+}
+
+.btn-excluir-cancelar {
+    background-color: #e57373;
+    color: white;
+}
+
+.items-list {
+    margin-top: 20px;
+}
+
+.items-list.hidden {
+    display: none;
+}
+
+.estoque-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    border-radius: 15px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.estoque-info h3 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2em;
+    color: #333;
+    margin: 0 0 8px 0;
+}
+
+.estoque-info p {
+    margin: 4px 0;
+    font-size: 0.95em;
+    color: #666;
+}
+
+.btn-delete-item {
+    background-color: #e57373;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+
+.estoque-resumo {
+    background-color: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 20px;
+    margin-bottom: 90px;
+}
+
+.estoque-resumo h3 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.3em;
+    color: #3a9a6c;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+#resumo-content {
+    font-size: 0.95em;
+    color: #666;
+    line-height: 1.6;
+}
+
+.hidden {
+    display: none !important;
+}
+/* Cards com alertas de validade */
+.estoque-card.card-proximo-vencimento {
+    background-color: #fff9c4 !important; /* Amarelo claro */
+    border-left: 4px solid #f9a825; /* Amarelo escuro */
+}
+
+.estoque-card.card-vencido {
+    background-color: #ffcdd2 !important; /* Vermelho claro */
+    border-left: 4px solid #d32f2f; /* Vermelho escuro */
+}
+
+.estoque-card.card-proximo-vencimento .estoque-info h3,
+.estoque-card.card-vencido .estoque-info h3 {
+    font-weight: bold;
+}
+
+/* Estilo para select */
+.estoque-form select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #dcdcdc;
+    border-radius: 25px;
+    font-size: 1em;
+    box-sizing: border-box;
+    background-color: white;
+    font-family: 'Varela Round', sans-serif;
+    cursor: pointer;
+}
+
+/* Estilo para input de data */
+.estoque-form input[type="date"],
+.estoque-form input[type="number"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #dcdcdc;
+    border-radius: 25px;
+    font-size: 1em;
+    box-sizing: border-box;
+    background-color: white;
+    font-family: 'Varela Round', sans-serif;
+}
+/* ADICIONE ISSO AO FINAL DO SEU style.css */
+
+/* Cards com alertas de validade */
+.estoque-card.card-proximo-vencimento {
+    background-color: #fff9c4 !important;
+    border-left: 4px solid #f9a825;
+}
+
+.estoque-card.card-vencido {
+    background-color: #ffcdd2 !important;
+    border-left: 4px solid #d32f2f;
+}
+
+/* Cards com alertas de estoque */
+.estoque-card.card-esgotado {
+    background-color: #ffcdd2 !important;
+    border-left: 4px solid #d32f2f;
+}
+
+.estoque-card.card-estoque-baixo {
+    background-color: #ffe0b2 !important;
+    border-left: 4px solid #f57c00;
+}
+
+.estoque-card.card-proximo-vencimento .estoque-info h3,
+.estoque-card.card-vencido .estoque-info h3,
+.estoque-card.card-esgotado .estoque-info h3,
+.estoque-card.card-estoque-baixo .estoque-info h3 {
+    font-weight: bold;
+}
+
+/* Estilo para select */
+.estoque-form select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #dcdcdc;
+    border-radius: 25px;
+    font-size: 1em;
+    box-sizing: border-box;
+    background-color: white;
+    font-family: 'Varela Round', sans-serif;
+    cursor: pointer;
+}
+
+/* Estilo para input de data e número */
+.estoque-form input[type="date"],
+.estoque-form input[type="number"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #dcdcdc;
+    border-radius: 25px;
+    font-size: 1em;
+    box-sizing: border-box;
+    background-color: white;
+    font-family: 'Varela Round', sans-serif;
+}
+
+/* Botão de editar */
+.btn-edit-item {
+    background-color: #2196F3;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 10px;
+}
+
+.btn-edit-item:hover {
+    background-color: #1976D2;
+    transform: scale(1.1);
+}
+
+/* Ajuste quando há múltiplos botões no card */
+.estoque-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Linha separadora no resumo */
+.estoque-resumo hr {
+    margin: 20px 0;
+    border: none;
+    border-top: 1px solid #ddd;
+}
+
+/* Botão de voltar no header */
+.app-header .back-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.app-header .back-button .icon-img {
+    width: 20px;
+    filter: brightness(0) invert(1);
 }
