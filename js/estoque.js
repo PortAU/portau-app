@@ -225,6 +225,35 @@ document.addEventListener('DOMContentLoaded', () => {
         database.ref(`user-estoque/${userUid}/historico`).push(movimentacao);
     }
 
+    // Ajusta o estoque de um item (entrada/saída)
+    function ajustarEstoque(itemId, delta) {
+        const item = allItems.find(i => i.id === itemId);
+        if (!item) return alert('Item não encontrado.');
+
+        // Tenta extrair um número da quantidade atual
+        let quantidadeAtual = item.quantidade || 0;
+        if (typeof quantidadeAtual === 'string') {
+            const parsed = parseInt(quantidadeAtual.replace(/[^0-9-]/g, ''), 10);
+            quantidadeAtual = isNaN(parsed) ? 0 : parsed;
+        } else {
+            quantidadeAtual = Number(quantidadeAtual) || 0;
+        }
+
+        let novaQuantidade = quantidadeAtual + delta;
+        if (novaQuantidade < 0) novaQuantidade = 0;
+
+        database.ref(`user-estoque/${userUid}/${currentTab}/${itemId}`).update({ quantidade: novaQuantidade })
+            .then(() => {
+                registrarMovimentacao(currentTab, item.nome, Math.abs(delta), delta > 0 ? 'entrada' : 'saida');
+                alert('Estoque atualizado com sucesso!');
+                loadItems();
+            })
+            .catch(err => {
+                console.error('Erro ao ajustar estoque:', err);
+                alert('Erro ao ajustar estoque: ' + (err.message || err));
+            });
+    }
+
     // Formulário de adicionar
     formAdicionar.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -551,6 +580,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 botoesHTML = `<button class="btn-delete-item" data-id="${item.id}">🗑️</button>`;
             } else if (editMode) {
                 botoesHTML = `<button class="btn-edit-item" data-id="${item.id}">✏️</button>`;
+            } else {
+                // Em modo normal, exibimos ações rápidas: Entrada (+), Saída (-) e Editar
+                botoesHTML = `
+                    <div class="estoque-actions">
+                        <button class="btn-mov btn-entrada" data-id="${item.id}" title="Entrada">➕</button>
+                        <button class="btn-mov btn-saida" data-id="${item.id}" title="Saída">➖</button>
+                        <button class="btn-edit-item" data-id="${item.id}" title="Editar">✏️</button>
+                    </div>
+                `;
             }
             
             card.innerHTML = infoHTML + botoesHTML;
@@ -565,6 +603,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.querySelector('.btn-edit-item').addEventListener('click', () => {
                     editarItem(item.id);
                 });
+            } else {
+                // listeners para entrada/saída e editar
+                const btnEntrada = card.querySelector('.btn-entrada');
+                const btnSaida = card.querySelector('.btn-saida');
+                const btnEditar = card.querySelector('.btn-edit-item');
+
+                if (btnEntrada) {
+                    btnEntrada.addEventListener('click', () => {
+                        // Pergunta ao usuário a quantidade a adicionar
+                        const valor = prompt('Quantidade a adicionar:');
+                        const qtd = parseInt(valor);
+                        if (isNaN(qtd) || qtd <= 0) return alert('Quantidade inválida.');
+                        ajustarEstoque(item.id, qtd);
+                    });
+                }
+
+                if (btnSaida) {
+                    btnSaida.addEventListener('click', () => {
+                        const valor = prompt('Quantidade a remover:');
+                        const qtd = parseInt(valor);
+                        if (isNaN(qtd) || qtd <= 0) return alert('Quantidade inválida.');
+                        ajustarEstoque(item.id, -qtd);
+                    });
+                }
+
+                if (btnEditar) {
+                    btnEditar.addEventListener('click', () => {
+                        editarItem(item.id);
+                    });
+                }
             }
             
             itemsList.appendChild(card);
