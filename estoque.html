@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortAu SJPA - Estoque</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/style.css?v=2.2">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Varela+Round&display=swap" rel="stylesheet">
+</head>
+
+<body class="main-app-body">
+
+    <div class="app-container">
+
+        <header class="app-header">
+            <!-- Botão de voltar -->
+            <a href="home.html" class="header-icon back-button">
+                <img src="images/seta.png" alt="Voltar" class="icon-img" style="width: 20px; filter: brightness(0) invert(1);">
+            </a>
+            
+            <div class="logo-header">
+                <img src="images/logo.png" alt="Logo PortAu SJPA">
+            </div>
+            <div class="search-container">
+                <img src="images/lupa.png" alt="Ícone Lupa" class="search-icon">
+                <input type="text" class="search-bar" id="search-bar" placeholder="Buscar...">
+                <img src="images/filtro.png" alt="Ícone Filtro" class="filter-icon" id="filter-icon">
+            </div>
+            <button class="header-icon menu-button">
+                <img src="images/menu-aberto.png" alt="Ícone Menu">
+            </button>
+        </header>
+
+        <main class="main-content with-bottom-nav">
+            <h1 class="page-title">Estoque</h1>
+
+            <!-- Abas de Navegação -->
+            <div class="tab-navigation">
+                <button class="tab-button active" data-tab="racao">Ração</button>
+                <button class="tab-button" data-tab="medicamentos">Medicamentos</button>
+            </div>
+
+            <!-- Menu Principal (visível ao carregar) -->
+            <div id="main-menu" class="estoque-menu">
+                <button class="btn-estoque" id="btn-adicionar">ADICIONAR</button>
+                <button class="btn-estoque" id="btn-consultar">CONSULTAR</button>
+                <button class="btn-estoque" id="btn-excluir">EXCLUIR</button>
+            </div>
+
+            <!-- Seção de Adicionar (oculta inicialmente) -->
+            <div id="adicionar-section" class="estoque-section hidden">
+                <h2 class="section-subtitle">Adicionar</h2>
+                <form id="form-adicionar" class="estoque-form">
+                    <div class="form-group">
+                        <label id="label-nome">Nome da Ração</label>
+                        <input type="text" id="item-nome" placeholder="Ex: Pedigree Adulto" required>
+                    </div>
+                    
+                    <!-- Campo de Quantidade para ração -->
+                    <div class="form-group" id="group-quantidade-racao">
+                        <label>Qtde</label>
+                        <input type="text" id="item-quantidade" placeholder="Ex: 100 kg" required>
+                    </div>
+                    
+                    <!-- Campos específicos para MEDICAMENTOS -->
+                    <div id="campos-medicamentos" class="hidden">
+                        <div class="form-group">
+                            <label>Quantidade (unidades)</label>
+                            <input type="number" id="item-quantidade-medicamento" placeholder="Ex: 50" min="0" value="">
+                        </div>
+                        <div class="form-group">
+                            <label>Quantidade mínima (alerta)</label>
+                            <input type="number" id="item-quantidade-minima" placeholder="Ex: 10" min="0" value="">
+                        </div>
+                        <div class="form-group">
+                            <label>Data de Validade</label>
+                            <input type="date" id="item-validade" value="">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label id="label-tipo">Tipo</label>
+                        <input type="text" id="item-tipo-racao" placeholder="Ex: Premium">
+                        <select id="item-tipo-medicamento" class="hidden">
+                            <option value="">Selecione o tipo</option>
+                            <option value="Antibiótico">Antibiótico</option>
+                            <option value="Anti-inflamatório">Anti-inflamatório</option>
+                            <option value="Antialérgico">Antialérgico</option>
+                            <option value="Antiparasitário">Antiparasitário</option>
+                            <option value="Vitamina">Vitamina</option>
+                            <option value="Analgésico">Analgésico</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-action">Adicionar</button>
+                </form>
+            </div>
+
+            <!-- Seção de Editar -->
+            <div id="editar-section" class="estoque-section hidden">
+                <h2 class="section-subtitle">Editar Item</h2>
+                <form id="form-editar" class="estoque-form">
+                    <input type="hidden" id="edit-item-id">
+                    
+                    <div class="form-group">
+                        <label id="label-edit-nome">Nome</label>
+                        <input type="text" id="edit-item-nome" required>
+                    </div>
+                    
+                    <div class="form-group" id="group-edit-quantidade-racao">
+                        <label>Qtde</label>
+                        <input type="text" id="edit-item-quantidade">
+                    </div>
+                    
+                    <div id="campos-edit-medicamentos" class="hidden">
+                        <div class="form-group">
+                            <label>Quantidade (unidades)</label>
+                            <input type="number" id="edit-item-quantidade-medicamento" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Quantidade mínima (alerta)</label>
+                            <input type="number" id="edit-item-quantidade-minima" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Data de Validade</label>
+                            <input type="date" id="edit-item-validade">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label id="label-edit-tipo">Tipo</label>
+                        <input type="text" id="edit-item-tipo-racao">
+                        <select id="edit-item-tipo-medicamento" class="hidden">
+                            <option value="">Selecione o tipo</option>
+                            <option value="Antibiótico">Antibiótico</option>
+                            <option value="Anti-inflamatório">Anti-inflamatório</option>
+                            <option value="Antialérgico">Antialérgico</option>
+                            <option value="Antiparasitário">Antiparasitário</option>
+                            <option value="Vitamina">Vitamina</option>
+                            <option value="Analgésico">Analgésico</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn-action">Salvar Alterações</button>
+                    <button type="button" class="btn-action" style="background-color: #999; margin-top: 10px;" id="btn-cancelar-edicao">Cancelar</button>
+                </form>
+            </div>
+
+            <!-- Seção de Consultar (oculta inicialmente) -->
+            <div id="consultar-section" class="estoque-section hidden">
+                <h2 class="section-subtitle">Consulta</h2>
+                <form id="form-filtro" class="estoque-form">
+                    <div class="form-group">
+                        <label id="label-filtro-nome">Nome</label>
+                        <input type="text" id="filtro-nome" placeholder="Ex: Premier">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo</label>
+                        <input type="text" id="filtro-tipo-racao" placeholder="Ex: Premium">
+                        <select id="filtro-tipo-medicamento" class="hidden">
+                            <option value="">Todos os tipos</option>
+                            <option value="Antibiótico">Antibiótico</option>
+                            <option value="Anti-inflamatório">Anti-inflamatório</option>
+                            <option value="Antialérgico">Antialérgico</option>
+                            <option value="Antiparasitário">Antiparasitário</option>
+                            <option value="Vitamina">Vitamina</option>
+                            <option value="Analgésico">Analgésico</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Filtros específicos para MEDICAMENTOS -->
+                    <div id="filtros-medicamentos" class="hidden">
+                        <div class="form-group">
+                            <label>Quantidade mínima</label>
+                            <input type="number" id="filtro-quantidade-min" placeholder="Ex: 10" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Status da Validade</label>
+                            <select id="filtro-validade">
+                                <option value="">Todos</option>
+                                <option value="valido">Válidos</option>
+                                <option value="proximo">Próximos ao vencimento (30 dias)</option>
+                                <option value="vencido">Vencidos</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Status do Estoque</label>
+                            <select id="filtro-estoque">
+                                <option value="">Todos</option>
+                                <option value="esgotado">Esgotado (0)</option>
+                                <option value="baixo">Estoque baixo</option>
+                                <option value="normal">Estoque normal</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn-action" id="btn-filtrar">Filtrar</button>
+                </form>
+            </div>
+
+            <!-- Seção de Excluir (oculta inicialmente) -->
+            <div id="excluir-section" class="estoque-section hidden">
+                <h2 class="section-subtitle" id="excluir-title">Excluir item?</h2>
+                <div class="excluir-buttons">
+                    <button class="btn-excluir-confirmar" id="btn-excluir-sim">Excluir</button>
+                    <button class="btn-excluir-cancelar" id="btn-excluir-nao">Cancelar</button>
+                </div>
+            </div>
+
+            <!-- Lista de Itens -->
+            <div id="items-list" class="items-list hidden">
+                <!-- Os itens serão carregados aqui dinamicamente -->
+            </div>
+
+            <!-- Resumo do Estoque -->
+            <div id="estoque-resumo" class="estoque-resumo">
+                <h3>Histórico de Movimentações</h3>
+                <div id="resumo-content">
+                    <p>Total de unidades disponíveis: <span id="total-unidades">0</span></p>
+                </div>
+            </div>
+
+        </main>
+
+        <footer class="bottom-nav">
+            <a href="home.html" class="nav-button">
+                <img src="images/patas.png" alt="Ícone Pets">
+                <span>PETS</span>
+            </a>
+            <a href="baias.html" class="nav-button">
+                <img src="images/casa.png" alt="Ícone Baias">
+                <span>BAIAS</span>
+            </a>
+            <a href="estoque.html" class="nav-button active">
+                <img src="images/osso.png" alt="Ícone Estoque">
+                <span>Estoque</span>
+            </a>
+        </footer>
+
+    </div>
+
+    <div id="side-menu-container" class="menu-container">
+        <nav class="menu-panel">
+            <div class="menu-header">
+                <img src="images/logo.png" alt="Logo PortAu SJPA">
+            </div>
+            
+            <div class="menu-options">
+                <a href="perfil.html" class="menu-button-item">MEU PERFIL</a>
+                <a href="suporte.html" class="menu-button-item">SUPORTE PORTAU</a>
+            </div>
+
+            <div class="menu-footer">
+                <a href="index.html" class="menu-logout-button">SAIR DO PORTAU</a>
+            </div>
+        </nav>
+    </div>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/estoque.js"></script>
+    <script src="js/menu.js"></script>
+</body>
+</html>
