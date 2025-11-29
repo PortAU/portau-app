@@ -495,25 +495,6 @@ h1 {
     resize: vertical;
 }
 
-
-.pet-photo-upload {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 140px;
-    border: 2px solid #dcdcdc;
-    border-radius: 15px;
-    cursor: pointer;
-    background-color: #ededed;
-    color: #a0a0a0;
-    text-align: center;
-    font-family: 'Varela Round', sans-serif;
-}
-.pet-photo-upload span {
-    padding: 10px;
-}
-
 /* Botão de salvar com a cor verde */
 .btn-salvar {
     width: 100%;
@@ -1425,3 +1406,54 @@ h1 {
     width: 20px;
     filter: brightness(0) invert(1);
 }
+
+.animal-card {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    background: #fff;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.animal-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: #eee;
+}
+
+.pet-photo-upload {
+    display: inline-block;
+    padding: 8px 12px;
+    background: #ffbb33;
+    color: #000;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.pet-photo-upload span {
+    pointer-events: none;
+}
+
+/* Oculta qualquer borda grande ou box estranho */
+.pet-photo-upload {
+    width: auto !important;
+    height: auto !important;
+    border: none !important;
+}
+
+.pet-photo-preview {
+    width: 180px;
+    height: 180px;
+    border-radius: 10px;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto 10px auto;
+}
+
