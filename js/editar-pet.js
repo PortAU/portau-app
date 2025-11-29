@@ -1,93 +1,136 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const petId = urlParams.get('id');
+// =========================
+// PEGAR ID DO PET NA URL
+// =========================
+const urlParams = new URLSearchParams(window.location.search);
+const petId = urlParams.get("id");
 
-  // Espera o Firebase autenticar o usuário antes de fazer qualquer ação
-  firebase.auth().onAuthStateChanged((user) => {
+if (!petId) {
+    alert("Erro: nenhum pet selecionado.");
+    window.location.href = "home.html";
+}
+
+let userId = null;
+
+// =========================
+// REFERÊNCIAS
+// =========================
+const db = firebase.database();
+
+const photoPreview = document.getElementById("pet-photo-preview");
+const btnChangePhoto = document.getElementById("btn-change-photo");
+const inputPhoto = document.getElementById("pet-photo-input");
+
+let currentPhotoBase64 = null;
+let newPhotoBase64 = null;
+
+// =========================
+// PEGAR USUÁRIO LOGADO
+// =========================
+firebase.auth().onAuthStateChanged(user => {
     if (!user) {
-      alert('Usuário não autenticado.');
-      window.location.href = 'index.html';
-      return;
+        alert("Você precisa estar logado.");
+        window.location.href = "index.html";
+        return;
     }
 
-    const userId = user.uid;
-    const form = document.getElementById('edit-pet-form');
+    userId = user.uid;
 
-    // Carrega os dados do pet
-    firebase.database().ref(`user-pets/${userId}/${petId}`).once('value')
-      .then((snapshot) => {
-        const petData = snapshot.val();
-        if (petData) {
-          document.getElementById('pet-name').value = petData.nome || '';
-          document.getElementById('pet-sex').value = petData.sexo || '';
-          document.getElementById('pet-race').value = petData.raca || '';
-          document.getElementById('pet-fur').value = petData.pelagem || ''; // corrigido para "pelagem"
-          document.getElementById('pet-size').value = petData.porte || '';
-          document.getElementById('pet-species').value = petData.especie || '';
-          document.getElementById('pet-temperament').value = petData.genio || '';
-          document.getElementById('pet-bay').value = petData.baia || '';
-          document.getElementById('pet-birthdate').value = petData.dataNascimento || '';
-          document.getElementById('pet-collection-date').value = petData.dataRecolhimento || '';
-          document.getElementById('pet-obs').value = petData.observacoes || '';
-        }
-      })
-      .catch((error) => {
-        console.error('Erro ao buscar dados do pet:', error);
-        alert('Erro ao carregar dados do pet.');
-      });
+    // Depois de ter o userId → carregar os dados do pet
+    carregarPet();
+});
 
-    // Atualiza os dados
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
+function carregarPet() {
+    db.ref("user-pets/" + userId + "/" + petId)
+        .once("value")
+        .then(snapshot => {
+            const pet = snapshot.val();
 
-      const updatedData = {
-        nome: document.getElementById('pet-name').value,
-        sexo: document.getElementById('pet-sex').value,
-        raca: document.getElementById('pet-race').value,
-        pelagem: document.getElementById('pet-fur').value,
-        porte: document.getElementById('pet-size').value,
-        especie: document.getElementById('pet-species').value,
-        genio: document.getElementById('pet-temperament').value,
-        baia: document.getElementById('pet-bay').value,
-        dataNascimento: document.getElementById('pet-birthdate').value,
-        dataRecolhimento: document.getElementById('pet-collection-date').value,
-        observacoes: document.getElementById('pet-obs').value,
-        userId: userId,
-        updatedAt: firebase.database.ServerValue.TIMESTAMP
-      };
+            if (!pet) {
+                alert("Pet não encontrado.");
+                return;
+            }
 
-      const updates = {};
-      updates[`/pets/${petId}`] = updatedData;
-      updates[`/user-pets/${userId}/${petId}`] = updatedData;
+            // Preenche inputs
+            document.getElementById("pet-name").value = pet.nome || "";
+            document.getElementById("pet-sex").value = pet.sexo || "";
+            document.getElementById("pet-race").value = pet.raca || "";
+            document.getElementById("pet-fur").value = pet.pelagem || "";
+            document.getElementById("pet-size").value = pet.porte || "";
+            document.getElementById("pet-species").value = pet.especie || "";
+            document.getElementById("pet-temperament").value = pet.genio || "";
+            document.getElementById("pet-bay").value = pet.baia || "";
+            document.getElementById("pet-birthdate").value = pet.dataNascimento || "";
+            document.getElementById("pet-collection-date").value = pet.dataRecolhimento || "";
+            document.getElementById("pet-obs").value = pet.observacoes || "";
 
-      firebase.database().ref().update(updates)
-        .then(() => {
-          alert('Pet atualizado com sucesso!');
-          window.location.href = 'home.html';
-        })
-        .catch((error) => {
-          console.error('Erro ao atualizar:', error);
-          alert('Erro ao atualizar o pet.');
+            if (pet.foto) {
+                currentPhotoBase64 = pet.foto;
+                photoPreview.src = pet.foto;
+            }
         });
-    });
+}
 
-    // Deleta o pet
-    document.getElementById('delete-pet').addEventListener('click', () => {
-      if (confirm('Tem certeza que deseja deletar este pet?')) {
-        const updates = {};
-        updates[`/pets/${petId}`] = null;
-        updates[`/user-pets/${userId}/${petId}`] = null;
+// =========================
+// BOTÃO "ALTERAR FOTO"
+// =========================
+btnChangePhoto.addEventListener("click", () => {
+    inputPhoto.click();
+});
 
-        firebase.database().ref().update(updates)
-          .then(() => {
-            alert('Pet deletado com sucesso!');
-            window.location.href = 'home.html';
-          })
-          .catch((error) => {
-            console.error('Erro ao deletar:', error);
-            alert('Erro ao deletar o pet.');
-          });
-      }
-    });
-  });
+// =========================
+// PREVIEW DA NOVA FOTO
+// =========================
+inputPhoto.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        newPhotoBase64 = e.target.result;
+        photoPreview.src = newPhotoBase64;
+    };
+
+    reader.readAsDataURL(file);
+});
+
+// =========================
+// SALVAR ALTERAÇÕES
+// =========================
+document.getElementById("edit-pet-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!userId) return alert("Erro de autenticação.");
+
+    const fotoFinal = newPhotoBase64 || currentPhotoBase64;
+
+    const updatedData = {
+        nome: document.getElementById("pet-name").value,
+        sexo: document.getElementById("pet-sex").value,
+        raca: document.getElementById("pet-race").value,
+        pelagem: document.getElementById("pet-fur").value,
+        porte: document.getElementById("pet-size").value,
+        especie: document.getElementById("pet-species").value,
+        genio: document.getElementById("pet-temperament").value,
+        baia: document.getElementById("pet-bay").value,
+        dataNascimento: document.getElementById("pet-birthdate").value,
+        dataRecolhimento: document.getElementById("pet-collection-date").value,
+        observacoes: document.getElementById("pet-obs").value,
+        foto: fotoFinal
+    };
+
+    await db.ref("user-pets/" + userId + "/" + petId).update(updatedData);
+
+    alert("Alterações salvas!");
+    window.location.href = "home.html";
+});
+
+// =========================
+// DELETAR PET
+// =========================
+document.getElementById("delete-pet").addEventListener("click", async () => {
+    if (!confirm("Tem certeza que deseja excluir este pet?")) return;
+
+    await db.ref("user-pets/" + userId + "/" + petId).remove();
+    alert("Pet excluído!");
+    window.location.href = "home.html";
 });
