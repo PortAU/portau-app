@@ -23,25 +23,71 @@ document.addEventListener('DOMContentLoaded', () => {
   if (signupForm) {
     signupForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const email = signupForm.querySelector('input[type="email"]').value;
-      const password = signupForm.querySelector('input[type="password"]').value;
       
-      auth.createUserWithEmailAndPassword(email, password)
+      // Captura todos os valores dos campos
+      const nome = document.getElementById('signup-nome').value.trim();
+      const usuario = document.getElementById('signup-usuario').value.trim();
+      const senha = document.getElementById('signup-senha').value;
+      const confirmarSenha = document.getElementById('signup-confirmar-senha').value;
+      const email = document.getElementById('signup-email').value.trim();
+      const confirmarEmail = document.getElementById('signup-confirmar-email').value.trim();
+
+      // Validações
+      if (!nome) {
+        alert('Por favor, insira seu nome completo');
+        return;
+      }
+
+      if (!usuario) {
+        alert('Por favor, insira um usuário');
+        return;
+      }
+
+      if (senha !== confirmarSenha) {
+        alert('As senhas não coincidem');
+        return;
+      }
+
+      if (email !== confirmarEmail) {
+        alert('Os emails não coincidem');
+        return;
+      }
+
+      if (senha.length < 6) {
+        alert('A senha deve ter pelo menos 6 caracteres');
+        return;
+      }
+
+      auth.createUserWithEmailAndPassword(email, senha)
         .then((userCredential) => {
-          // Salva dados adicionais do usuário no Realtime Database
-          return database.ref('users/' + userCredential.user.uid).set({
-            nome: signupForm.querySelector('input[type="text"]').value,
-            email: email,
-            endereco: {
-              rua: signupForm.querySelector('input[placeholder="Rua*"]').value,
-              numero: signupForm.querySelector('input[placeholder="Número"]').value,
-              bairro: signupForm.querySelector('input[placeholder="Bairro*"]').value,
-              cep: signupForm.querySelector('input[placeholder="CEP"]').value,
-              complemento: signupForm.querySelector('input[placeholder="Complemento"]').value
-            }
+          // Salva o nome de usuário no displayName do Firebase Auth
+          return userCredential.user.updateProfile({
+            displayName: nome
+          }).then(() => {
+            // Salva dados adicionais do usuário no Realtime Database
+            const uid = userCredential.user.uid;
+            const userData = {
+              nome: nome.trim(),
+              usuario: usuario.trim(),
+              email: email.trim(),
+              dataCriacao: new Date().toISOString()
+            };
+            
+            return firebase.database().ref('users/' + uid).set(userData);
+          }).catch(error => {
+            // Se updateProfile falhar, continua mesmo assim salvando no banco
+            const uid = userCredential.user.uid;
+            const userData = {
+              nome: nome.trim(),
+              usuario: usuario.trim(),
+              email: email.trim(),
+              dataCriacao: new Date().toISOString()
+            };
+            return firebase.database().ref('users/' + uid).set(userData);
           });
         })
         .then(() => {
+          alert('Conta criada com sucesso!');
           window.location.href = 'home.html';
         })
         .catch(error => {

@@ -41,31 +41,6 @@
                     <input type="email" id="user-email" disabled> 
                 </div>
 
-                <h2 class="form-section-title">Endereço principal</h2>
-                <div class="address-grid">
-                    <div class="form-group">
-                        <label for="user-street">Rua</label>
-                        <input type="text" id="user-street">
-                    </div>
-                    <div class="form-group">
-                        <label for="user-number">Número</label>
-                        <input type="text" id="user-number">
-                    </div>
-                    <div class="form-group">
-                        <label for="user-neighborhood">Bairro</label>
-                        <input type="text" id="user-neighborhood">
-                    </div>
-                    <div class="form-group">
-                        <label for="user-cep">CEP</label>
-                        <input type="text" id="user-cep">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="user-complement">Complemento</label>
-                    <input type="text" id="user-complement">
-                </div>
-
                 <div class="button-group">
                     <button type="button" class="btn-secondary" disabled>ALTERAR SENHA</button>
                     <button type="submit" class="btn-salvar">SALVAR</button>
@@ -102,41 +77,57 @@
                 
                 // 2. Preenche os campos que vêm direto da Autenticação
                 document.getElementById('user-email').value = user.email || '';
-                // Usamos o 'displayName' para o nome completo, se ele existir
-                document.getElementById('user-fullname').value = user.displayName || '';
 
-                // 3. Busca o restante dos dados (endereço, usuário) no Realtime Database
+                // 3. Busca os dados do Realtime Database (fonte de verdade)
                 const dbRef = firebase.database().ref('users/' + userId);
                 
-                dbRef.once('value').then(snapshot => {
+                dbRef.once('value')
+                  .then(snapshot => {
                     if (snapshot.exists()) {
                         const data = snapshot.val();
                         
-                        // 4. Preenche os campos do formulário com os dados do banco
-                        // (Estou assumindo que as chaves no banco são as mesmas do 'id' dos campos)
-                        document.getElementById('user-username').value = data.username || '';
-                        document.getElementById('user-street').value = data.street || '';
-                        document.getElementById('user-number').value = data.number || '';
-                        document.getElementById('user-neighborhood').value = data.neighborhood || '';
-                        document.getElementById('user-cep').value = data.cep || '';
-                        document.getElementById('user-complement').value = data.complement || '';
-                        
-                        // Se o 'fullname' do banco for mais completo, ele sobrescreve o do Auth
-                        if(data.fullname) {
-                           document.getElementById('user-fullname').value = data.fullname;
+                        // DEBUG: Mostra TUDO que existe no banco
+                        console.log('=== DADOS NO FIREBASE ===');
+                        console.log('Objeto completo:', data);
+                        console.log('Todas as chaves:', Object.keys(data));
+                        for (let key in data) {
+                            console.log(`${key}: ${data[key]}`);
                         }
-
+                        console.log('======================');
+                        
+                        // 4. Preenche todos os campos com os dados do banco
+                        // Nome completo
+                        if (data.nome) {
+                            document.getElementById('user-fullname').value = data.nome;
+                        } else if (user.displayName) {
+                            // Fallback para displayName se não encontrar no banco
+                            document.getElementById('user-fullname').value = user.displayName;
+                        }
+                        
+                        // Usuário
+                        if (data.usuario) {
+                            document.getElementById('user-username').value = data.usuario;
+                        } else if (data.nome) {
+                            // Se não houver usuario, usa o nome como fallback
+                            document.getElementById('user-username').value = data.nome;
+                        }
                     } else {
-                        console.warn("Nenhum dado adicional encontrado no Realtime Database para este usuário.");
+                        // Se não houver dados no banco, tenta usar displayName
+                        if (user.displayName) {
+                            document.getElementById('user-fullname').value = user.displayName;
+                            document.getElementById('user-username').value = user.displayName;
+                        }
                     }
-                }).catch(error => {
-                    console.error("Erro ao buscar dados do perfil no Database: ", error);
-                    alert("Não foi possível carregar seus dados de endereço.");
-                });
+                  })
+                  .catch(error => {
+                    // Se houver erro, tenta usar displayName como fallback
+                    if (user.displayName) {
+                        document.getElementById('user-fullname').value = user.displayName;
+                    }
+                  });
 
             } else {
                 // 5. O usuário não está logado. Redireciona para a tela de login.
-                console.log("Usuário não está logado. Redirecionando...");
                 window.location.href = 'index.html';
             }
         });
