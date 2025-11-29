@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PortAu SJPA - Redefinir Senha</title>
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="css/style.css?v=2.1">
+    <link rel="stylesheet" href="css/style.css?v=3.2">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Varela+Round&display=swap" rel="stylesheet">
@@ -24,15 +24,69 @@
 
         <h1>ESQUECEU SUA SENHA</h1>
 
-        <form action="#">
+        <div id="errorMessage" style="background-color: rgba(255, 68, 68, 0.2); border-left: 4px solid #ff4444; padding: 12px; border-radius: 8px; margin-bottom: 20px; color: #ffcccc; font-size: 0.95em; display: none;"></div>
+        <div id="successMessage" style="background-color: rgba(255, 255, 255, 0.2); border-left: 4px solid #44ff44; padding: 12px; border-radius: 8px; margin-bottom: 20px; color: white; font-size: 0.95em; display: none;"></div>
+
+        <form id="forgotPasswordForm">
             <div class="input-group">
                 <label for="email">DIGITE SEU E-MAIL</label>
-                <input type="email" id="email" name="email">
+                <input type="email" id="email" name="email" required>
             </div>
             <button type="submit" class="btn-login">ENVIAR E-MAIL<br>PARA REDEFINIR</button>
         </form>
 
     </main>
+
+    <!-- Firebase + Auth -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="js/firebase-config.js"></script>
+
+    <script>
+        document.getElementById('forgotPasswordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+
+            // Limpar mensagens anteriores
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            errorMessage.textContent = '';
+            successMessage.textContent = '';
+
+            try {
+                // Enviar email de redefinição de senha
+                // Firebase envia automaticamente com um link seguro
+                await firebase.auth().sendPasswordResetEmail(email);
+
+                successMessage.textContent = '✅ Email de redefinição enviado com sucesso! Verifique sua caixa de entrada e clique no link.';
+                successMessage.style.display = 'block';
+
+                // Limpar o campo de email
+                document.getElementById('email').value = '';
+
+            } catch (error) {
+                console.error('Erro ao enviar email:', error);
+                let mensagem = '❌ Erro ao enviar email de redefinição';
+
+                if (error.code === 'auth/user-not-found') {
+                    mensagem = '❌ Este email não está registrado no sistema';
+                } else if (error.code === 'auth/invalid-email') {
+                    mensagem = '❌ Email inválido';
+                } else if (error.code === 'auth/too-many-requests') {
+                    mensagem = '❌ Muitas tentativas. Tente novamente em alguns minutos';
+                } else if (error.message) {
+                    mensagem = '❌ ' + error.message;
+                }
+
+                errorMessage.textContent = mensagem;
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
 </body>
 
 </html>

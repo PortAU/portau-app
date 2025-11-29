@@ -32,6 +32,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // --- ATUALIZA O BOTÃO ATIVO DO BOTTOM NAV ---
+    function updateActiveNavButton() {
+        const currentPage = window.location.pathname.split('/').pop() || 'home.html';
+        const navButtons = document.querySelectorAll('.nav-button');
+
+        navButtons.forEach(button => {
+            button.classList.remove('active');
+            const href = button.getAttribute('href');
+            if (href === currentPage) {
+                button.classList.add('active');
+            }
+        });
+    }
+
+    updateActiveNavButton();
 });
 
 
