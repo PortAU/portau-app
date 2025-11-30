@@ -62,6 +62,11 @@ function carregarPet() {
             document.getElementById("pet-birthdate").value = pet.dataNascimento || "";
             document.getElementById("pet-collection-date").value = pet.dataRecolhimento || "";
             document.getElementById("pet-obs").value = pet.observacoes || "";
+            // Preenche status de adoção (armazenado como booleano)
+            const adoptedSelect = document.getElementById("pet-adopted");
+            if (adoptedSelect) {
+                adoptedSelect.value = (pet.adotado === true || pet.adotado === 'true') ? 'true' : 'false';
+            }
 
             if (pet.foto) {
                 currentPhotoBase64 = pet.foto;
@@ -111,6 +116,7 @@ document.getElementById("edit-pet-form").addEventListener("submit", async (e) =>
         porte: document.getElementById("pet-size").value,
         especie: document.getElementById("pet-species").value,
         genio: document.getElementById("pet-temperament").value,
+        adotado: (document.getElementById("pet-adopted") ? document.getElementById("pet-adopted").value === 'true' : false),
         baia: document.getElementById("pet-bay").value,
         dataNascimento: document.getElementById("pet-birthdate").value,
         dataRecolhimento: document.getElementById("pet-collection-date").value,
@@ -118,7 +124,9 @@ document.getElementById("edit-pet-form").addEventListener("submit", async (e) =>
         foto: fotoFinal
     };
 
+    // Atualiza tanto em user-pets quanto em pets para manter consistência
     await db.ref("user-pets/" + userId + "/" + petId).update(updatedData);
+    await db.ref("pets/" + petId).update(updatedData);
 
     alert("Alterações salvas!");
     window.location.href = "home.html";

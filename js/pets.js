@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             pelagem: form.querySelector('#pet-fur').value,
             porte: form.querySelector('#pet-size').value,
             especie: form.querySelector('#pet-species').value,
+            adotado: (form.querySelector('#pet-adopted') ? form.querySelector('#pet-adopted').value === 'true' : false),
             genio: form.querySelector('#pet-temperament').value,
             baia: form.querySelector('#pet-bay').value,
             dataNascimento: form.querySelector('#pet-birthdate').value,

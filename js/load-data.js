@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!allDataSnapshot || !allDataSnapshot.exists()) {
             container.innerHTML = `
             <div class="empty-state">
-                <p>Nenhum ${isBaiasPage ? 'baia' : 'pet'} cadastrado ainda</p>
+                <p>${isBaiasPage ? 'Nenhuma baia cadastrada ainda' : 'Nenhum pet cadastrado ainda'}</p>
             </div>`;
             return;
         }
@@ -62,7 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let searchableText = '';
             if (isBaiasPage) {
-                searchableText = `${data.nomeBaia || ''} ${data.porte || ''} ${data.genio || ''}`.toLowerCase();
+                const baiaName = data.nome || data.nomeBaia || '';
+                searchableText = `${baiaName} ${data.porte || ''} ${data.genio || ''}`.toLowerCase();
             } else {
                 searchableText = `${data.nome || ''} ${data.especie || ''} ${data.raca || ''}`.toLowerCase();
             }
@@ -102,9 +103,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (isBaiasPage) {
+                const baiaName = data.nome || data.nomeBaia || 'Sem nome';
                 card.innerHTML = `
                     <div class="animal-info">
-                        <h3>${data.nomeBaia || 'Sem nome'}</h3>
+                        <h3>${baiaName}</h3>
                         <p>Porte: ${data.porte || '-'}</p>
                         <p>Gênio: ${data.genio || '-'}</p>
                         <p>Idade: ${data.idade || '-'}</p>
@@ -117,6 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <p>Espécie: ${data.especie || '-'}</p>
                         <p>Raça: ${data.raca || '-'}</p>
                         <p>Baia: ${data.baia || '-'}</p>
+                        <p>Status: ${data.adotado ? 'Adotado' : 'Disponível'}</p>
                     </div>`;
             }
 

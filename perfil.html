@@ -26,19 +26,16 @@
         </header>
 
         <main class="main-content form-page">
-            <form action="#" class="pet-form">
+            <form action="#" id="profile-form" class="pet-form">
                 
                 <div class="form-group">
                     <label for="user-fullname">Nome completo</label>
                     <input type="text" id="user-fullname">
                 </div>
-                <div class="form-group">
-                    <label for="user-username">Usuário</label>
-                    <input type="text" id="user-username">
-                </div>
+                <!-- Campo 'Usuário' removido conforme solicitado -->
                 <div class="form-group">
                     <label for="user-email">Email</label>
-                    <input type="email" id="user-email" disabled> 
+                    <input type="email" id="user-email"> 
                 </div>
 
                 <div class="button-group">
@@ -80,51 +77,94 @@
 
                 // 3. Busca os dados do Realtime Database (fonte de verdade)
                 const dbRef = firebase.database().ref('users/' + userId);
-                
+
                 dbRef.once('value')
                   .then(snapshot => {
                     if (snapshot.exists()) {
                         const data = snapshot.val();
-                        
-                        // DEBUG: Mostra TUDO que existe no banco
-                        console.log('=== DADOS NO FIREBASE ===');
-                        console.log('Objeto completo:', data);
-                        console.log('Todas as chaves:', Object.keys(data));
-                        for (let key in data) {
-                            console.log(`${key}: ${data[key]}`);
-                        }
-                        console.log('======================');
-                        
-                        // 4. Preenche todos os campos com os dados do banco
-                        // Nome completo
+
+                        // Preenche os campos com os dados do banco (nome e email)
                         if (data.nome) {
                             document.getElementById('user-fullname').value = data.nome;
                         } else if (user.displayName) {
-                            // Fallback para displayName se não encontrar no banco
                             document.getElementById('user-fullname').value = user.displayName;
                         }
-                        
-                        // Usuário
-                        if (data.usuario) {
-                            document.getElementById('user-username').value = data.usuario;
-                        } else if (data.nome) {
-                            // Se não houver usuario, usa o nome como fallback
-                            document.getElementById('user-username').value = data.nome;
+
+                        if (data.email) {
+                            document.getElementById('user-email').value = data.email;
+                        } else if (user.email) {
+                            document.getElementById('user-email').value = user.email;
                         }
                     } else {
-                        // Se não houver dados no banco, tenta usar displayName
+                        // Se não houver dados no banco, tenta usar displayName/email
                         if (user.displayName) {
                             document.getElementById('user-fullname').value = user.displayName;
-                            document.getElementById('user-username').value = user.displayName;
+                        }
+                        if (user.email) {
+                            document.getElementById('user-email').value = user.email;
                         }
                     }
                   })
                   .catch(error => {
-                    // Se houver erro, tenta usar displayName como fallback
+                    console.error('Erro ao ler dados do perfil:', error);
+                    // fallback para displayName/email caso leitura falhe
                     if (user.displayName) {
                         document.getElementById('user-fullname').value = user.displayName;
                     }
+                    if (user.email) {
+                        document.getElementById('user-email').value = user.email;
+                    }
                   });
+
+                // --- Submeter alterações do perfil ---
+                const profileForm = document.getElementById('profile-form');
+                profileForm.addEventListener('submit', async (evt) => {
+                    evt.preventDefault();
+
+                    const newName = document.getElementById('user-fullname').value.trim();
+                    const newEmail = document.getElementById('user-email').value.trim();
+
+                    const currentUser = firebase.auth().currentUser;
+                    if (!currentUser) {
+                        alert('Usuário não autenticado.');
+                        window.location.href = 'index.html';
+                        return;
+                    }
+
+                    // Desabilita o botão salvar enquanto processa
+                    const saveBtn = profileForm.querySelector('.btn-salvar');
+                    if (saveBtn) saveBtn.disabled = true;
+
+                    try {
+                        // Atualiza displayName se mudou
+                        if (currentUser.displayName !== newName) {
+                            await currentUser.updateProfile({ displayName: newName });
+                        }
+
+                        // Atualiza email, pode requerer reautenticação
+                        if (currentUser.email !== newEmail) {
+                            await currentUser.updateEmail(newEmail);
+                        }
+
+                        // Atualiza também no Realtime Database
+                        await firebase.database().ref('users/' + currentUser.uid).update({
+                            nome: newName,
+                            email: newEmail
+                        });
+
+                        alert('Perfil atualizado com sucesso!');
+                        window.location.href = 'home.html';
+                    } catch (err) {
+                        console.error('Erro ao atualizar perfil:', err);
+                        if (err && err.code === 'auth/requires-recent-login') {
+                            alert('Para alterar o email é necessário fazer login novamente. Saia e entre novamente antes de atualizar o email.');
+                        } else {
+                            alert('Erro ao atualizar perfil: ' + (err.message || err));
+                        }
+                    } finally {
+                        if (saveBtn) saveBtn.disabled = false;
+                    }
+                });
 
             } else {
                 // 5. O usuário não está logado. Redireciona para a tela de login.

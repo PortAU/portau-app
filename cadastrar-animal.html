@@ -29,21 +29,34 @@
             <form action="#" class="pet-form">
                 
                 <div class="form-group">
-                    <label for="foto">Foto do pet:</label>
-                    <input type="file" accept="image/*" id="foto" />
-                    <img id="preview-foto"
-                    style="max-width: 200px; display:none; margin-top:10px; border-radius:8px;">
+                    <label>Foto do pet</label>
+
+                    <img id="preview-foto" class="pet-photo-preview" src="images/default-pet.png" style="max-width:200px; margin-top:10px; border-radius:8px;">
+
+                    <button type="button" id="btn-change-photo" class="btn-salvar" style="margin-top:10px;">ESCOLHER FOTO</button>
+
+                    <input type="file" accept="image/*" id="foto" style="display:none;">
                 </div>
 
-                
                 <div class="form-group">
                     <label for="pet-name">Nome</label>
                     <input type="text" id="pet-name" placeholder="Nome do pet">
                 </div>
                 
                 <div class="form-group">
+                    <label for="pet-adopted">Status de adoção</label>
+                    <select id="pet-adopted">
+                        <option value="false" selected>Não adotado</option>
+                        <option value="true">Adotado</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="pet-sex">Sexo</label>
-                    <input type="text" id="pet-sex" placeholder="Sexo do pet">
+                    <select id="pet-sex">
+                        <option value="">Selecione</option>
+                        <option value="Macho">Macho</option>
+                        <option value="Fêmea">Fêmea</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
@@ -53,12 +66,22 @@
 
                 <div class="form-group">
                     <label for="pet-fur">Pelagem</label>
-                    <input type="text" id="pet-fur" placeholder="Pelo do pet">
+                    <select id="pet-fur">
+                        <option value="">Selecione</option>
+                        <option value="Curta">Curta</option>
+                        <option value="Média">Média</option>
+                        <option value="Grande">Grande</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
                     <label for="pet-size">Porte</label>
-                    <input type="text" id="pet-size" placeholder="Porte do pet">
+                    <select id="pet-size">
+                        <option value="">Selecione</option>
+                        <option value="Pequeno">Pequeno</option>
+                        <option value="Médio">Médio</option>
+                        <option value="Grande">Grande</option>
+                    </select>
                 </div>
                 
                 <div class="form-group">
@@ -66,9 +89,16 @@
                     <input type="text" id="pet-species" placeholder="Espécie do pet">
                 </div>
 
+                <!-- Campo de Status de Adoção movido para o início (veja acima) -->
+                
                 <div class="form-group">
                     <label for="pet-temperament">Gênio</label>
-                    <input type="text" id="pet-temperament" placeholder="Gênio do pet">
+                    <select id="pet-temperament">
+                        <option value="">Selecione</option>
+                        <option value="Manso">Manso</option>
+                        <option value="Raivoso">Raivoso</option>
+                        <option value="Outro">Outro</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
@@ -78,12 +108,12 @@
 
                 <div class="form-group">
                     <label for="pet-birthdate">Data nascimento</label>
-                    <input type="text" id="pet-birthdate" placeholder="XX/XX/XXXX">
+                    <input type="date" id="pet-birthdate">
                 </div>
 
                 <div class="form-group">
                     <label for="pet-collection-date">Data recolhimento</label>
-                    <input type="text" id="pet-collection-date" placeholder="XX/XX/XXXX">
+                    <input type="date" id="pet-collection-date">
                 </div>
 
                 <div class="form-group">
@@ -123,5 +153,15 @@
     <script type="module" src="./js/pets.js"></script>
 
 
+    <script>
+        // Intercepta o botão de escolher foto e aciona o input hidden
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('btn-change-photo');
+            const input = document.getElementById('foto');
+            if (btn && input) {
+                btn.addEventListener('click', () => input.click());
+            }
+        });
+    </script>
 </body>
 </html>

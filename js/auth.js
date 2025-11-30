@@ -24,22 +24,16 @@ document.addEventListener('DOMContentLoaded', () => {
     signupForm.addEventListener('submit', (e) => {
       e.preventDefault();
       
-      // Captura todos os valores dos campos
-      const nome = document.getElementById('signup-nome').value.trim();
-      const usuario = document.getElementById('signup-usuario').value.trim();
-      const senha = document.getElementById('signup-senha').value;
-      const confirmarSenha = document.getElementById('signup-confirmar-senha').value;
-      const email = document.getElementById('signup-email').value.trim();
-      const confirmarEmail = document.getElementById('signup-confirmar-email').value.trim();
+  // Captura todos os valores dos campos
+  const nome = document.getElementById('signup-nome').value.trim();
+  const senha = document.getElementById('signup-senha').value;
+  const confirmarSenha = document.getElementById('signup-confirmar-senha').value;
+  const email = document.getElementById('signup-email').value.trim();
+  const confirmarEmail = document.getElementById('signup-confirmar-email').value.trim();
 
       // Validações
       if (!nome) {
         alert('Por favor, insira seu nome completo');
-        return;
-      }
-
-      if (!usuario) {
-        alert('Por favor, insira um usuário');
         return;
       }
 
@@ -68,18 +62,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const uid = userCredential.user.uid;
             const userData = {
               nome: nome.trim(),
-              usuario: usuario.trim(),
               email: email.trim(),
               dataCriacao: new Date().toISOString()
             };
-            
+
             return firebase.database().ref('users/' + uid).set(userData);
           }).catch(error => {
             // Se updateProfile falhar, continua mesmo assim salvando no banco
             const uid = userCredential.user.uid;
             const userData = {
               nome: nome.trim(),
-              usuario: usuario.trim(),
               email: email.trim(),
               dataCriacao: new Date().toISOString()
             };

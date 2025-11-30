@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let allItems = [];
     let selectedItemForDelete = null;
     let itemsRefListener = null;
+    const searchBar = document.getElementById('search-bar');
 
     // Auth
     auth.onAuthStateChanged(user => {
@@ -76,6 +77,37 @@ document.addEventListener('DOMContentLoaded', () => {
         loadItems();
         showMainMenu();
     });
+
+    // Search handling
+    function applySearchFilter() {
+        if (!searchBar) return;
+        const term = (searchBar.value || '').toLowerCase().trim();
+        if (!term) {
+            // show all
+            renderItems(allItems);
+            return;
+        }
+
+        const filtered = allItems.filter(item => {
+            const nome = (item.nome || '').toString().toLowerCase();
+            const tipo = (item.tipo || '').toString().toLowerCase();
+            if (currentTab === 'racao') {
+                return nome.includes(term) || tipo.includes(term);
+            } else {
+                // medicamentos: busca por nome, tipo e validade
+                const validade = (item.dataValidade || '').toString().toLowerCase();
+                return nome.includes(term) || tipo.includes(term) || validade.includes(term);
+            }
+        });
+
+        renderItems(filtered);
+    }
+
+    if (searchBar) {
+        searchBar.addEventListener('input', () => {
+            applySearchFilter();
+        });
+    }
 
     // Tabs
     tabButtons.forEach(btn => {
@@ -175,7 +207,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (key === 'historico') return; // ignora nó histórico
                 allItems.push({ id: key, ...child.val() });
             });
-            renderItems(allItems, false);
+            // Aplica filtro de busca (se houver) ou renderiza tudo
+            applySearchFilter();
             updateResumo();
         }, err => {
             console.error('Erro carregando itens:', err);
