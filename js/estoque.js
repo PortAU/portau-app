@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const auth = firebase.auth();
     const database = firebase.database();
-    
+
     // Elementos do DOM
     const mainMenu = document.getElementById('main-menu');
     const adicionarSection = document.getElementById('adicionar-section');
@@ -12,30 +12,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemsList = document.getElementById('items-list');
     const resumoContent = document.getElementById('resumo-content');
     const totalUnidades = document.getElementById('total-unidades');
-    
+
     // Botões do menu principal
     const btnAdicionar = document.getElementById('btn-adicionar');
-    const btnConsultar = document.getElementById('btn-consultar');
-    const btnExcluir = document.getElementById('btn-excluir');
-    
+
     // Formulários
     const formAdicionar = document.getElementById('form-adicionar');
     const formEditar = document.getElementById('form-editar');
     const formFiltro = document.getElementById('form-filtro');
     const btnFiltrar = document.getElementById('btn-filtrar');
     const btnCancelarEdicao = document.getElementById('btn-cancelar-edicao');
-    
-    // Botões de exclusão
-    const btnExcluirSim = document.getElementById('btn-excluir-sim');
-    const btnExcluirNao = document.getElementById('btn-excluir-nao');
-    
+
     // Abas
     const tabButtons = document.querySelectorAll('.tab-button');
     const labelNome = document.getElementById('label-nome');
     const labelFiltroNome = document.getElementById('label-filtro-nome');
     const labelTipo = document.getElementById('label-tipo');
-    const excluirTitle = document.getElementById('excluir-title');
-    
+
     // Campos específicos
     const camposMedicamentos = document.getElementById('campos-medicamentos');
     const camposEditMedicamentos = document.getElementById('campos-edit-medicamentos');
@@ -48,44 +41,48 @@ document.addEventListener('DOMContentLoaded', () => {
     const editItemTipoMedicamento = document.getElementById('edit-item-tipo-medicamento');
     const filtroTipoRacao = document.getElementById('filtro-tipo-racao');
     const filtroTipoMedicamento = document.getElementById('filtro-tipo-medicamento');
-    
-    // Estado da aplicação
+
+    // Inputs adicionar
+    const inputNome = document.getElementById('item-nome');
+    const inputQuantidadeRacao = document.getElementById('item-quantidade');
+    const inputQuantidadeMedicamento = document.getElementById('item-quantidade-medicamento');
+    const inputQuantidadeMinima = document.getElementById('item-quantidade-minima');
+    const inputValidade = document.getElementById('item-validade');
+
+    // Inputs editar
+    const editId = document.getElementById('edit-item-id');
+    const editNome = document.getElementById('edit-item-nome');
+    const editQuantidadeRacao = document.getElementById('edit-item-quantidade');
+    const editQuantidadeMedicamento = document.getElementById('edit-item-quantidade-medicamento');
+    const editQuantidadeMinima = document.getElementById('edit-item-quantidade-minima');
+    const editValidade = document.getElementById('edit-item-validade');
+
+    // Estado
     let currentTab = 'racao';
     let userUid = null;
     let userName = '';
     let allItems = [];
     let selectedItemForDelete = null;
+    let itemsRefListener = null;
 
-    // Autenticação
+    // Auth
     auth.onAuthStateChanged(user => {
         if (!user) {
-            console.warn('Usuário não autenticado, redirecionando...');
             window.location.href = 'index.html';
             return;
         }
-        
-        console.log('Usuário autenticado:', user.uid);
         userUid = user.uid;
-        
-        // Busca o nome do usuário
-        database.ref('users/' + userUid).once('value').then(snapshot => {
-            if (snapshot.exists()) {
-                const userData = snapshot.val();
-                userName = userData.nome || userData.username || user.email || 'Usuário';
-            } else {
-                userName = user.displayName || user.email || 'Usuário';
-            }
-            loadItems();
-        });
+        userName = user.displayName || user.email || 'Usuário';
+        loadItems();
+        showMainMenu();
     });
 
-    // Navegação entre abas
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            
-            currentTab = button.dataset.tab;
+    // Tabs
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentTab = btn.dataset.tab;
             updateLabels();
             toggleFieldsByTab();
             loadItems();
@@ -93,686 +90,340 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Atualiza os labels e campos conforme a aba
     function updateLabels() {
         if (currentTab === 'racao') {
             labelNome.textContent = 'Nome da Ração';
-            labelFiltroNome.textContent = 'Nome da Ração';
             labelTipo.textContent = 'Tipo';
-            excluirTitle.textContent = 'Excluir ração?';
-            
-            // Atualiza placeholders para ração
-            document.getElementById('item-nome').placeholder = 'Ex: Pedigree Adulto';
-            document.getElementById('item-tipo-racao').placeholder = 'Ex: Premium';
+            if (labelFiltroNome) labelFiltroNome.textContent = 'Nome';
         } else {
             labelNome.textContent = 'Nome do Medicamento';
-            labelFiltroNome.textContent = 'Nome do Medicamento';
-            labelTipo.textContent = 'Tipo de Medicamento';
-            excluirTitle.textContent = 'Excluir medicamento?';
-            
-            // Atualiza placeholders para medicamentos
-            document.getElementById('item-nome').placeholder = 'Ex: Drontal Plus';
-            document.getElementById('item-quantidade-medicamento').placeholder = '50';
+            labelTipo.textContent = 'Tipo';
+            if (labelFiltroNome) labelFiltroNome.textContent = 'Nome';
         }
     }
 
-    // Mostra/esconde campos conforme a aba
     function toggleFieldsByTab() {
         if (currentTab === 'racao') {
-            // Ração - Adicionar
-            groupQuantidadeRacao.classList.remove('hidden');
             camposMedicamentos.classList.add('hidden');
+            groupQuantidadeRacao.classList.remove('hidden');
             itemTipoRacao.classList.remove('hidden');
             itemTipoMedicamento.classList.add('hidden');
-            
-            // Ração - Editar
-            groupEditQuantidadeRacao.classList.remove('hidden');
+            filtrosMedicamentos.classList.add('hidden');
+
             camposEditMedicamentos.classList.add('hidden');
+            groupEditQuantidadeRacao.classList.remove('hidden');
             editItemTipoRacao.classList.remove('hidden');
             editItemTipoMedicamento.classList.add('hidden');
-            
-            // Filtros
-            filtroTipoRacao.classList.remove('hidden');
-            filtroTipoMedicamento.classList.add('hidden');
-            filtrosMedicamentos.classList.add('hidden');
-            
-            // Remove required
-            document.getElementById('item-quantidade-medicamento').removeAttribute('required');
-            document.getElementById('item-validade').removeAttribute('required');
-            itemTipoMedicamento.removeAttribute('required');
         } else {
-            // Medicamentos - Adicionar
-            groupQuantidadeRacao.classList.add('hidden');
             camposMedicamentos.classList.remove('hidden');
+            groupQuantidadeRacao.classList.add('hidden');
             itemTipoRacao.classList.add('hidden');
             itemTipoMedicamento.classList.remove('hidden');
-            
-            // Medicamentos - Editar
-            groupEditQuantidadeRacao.classList.add('hidden');
+            filtrosMedicamentos.classList.remove('hidden');
+
             camposEditMedicamentos.classList.remove('hidden');
+            groupEditQuantidadeRacao.classList.add('hidden');
             editItemTipoRacao.classList.add('hidden');
             editItemTipoMedicamento.classList.remove('hidden');
-            
-            // Filtros
-            filtroTipoRacao.classList.add('hidden');
-            filtroTipoMedicamento.classList.remove('hidden');
-            filtrosMedicamentos.classList.remove('hidden');
-            
-            // Adiciona required
-            document.getElementById('item-quantidade-medicamento').setAttribute('required', 'required');
-            document.getElementById('item-validade').setAttribute('required', 'required');
-            itemTipoMedicamento.setAttribute('required', 'required');
+
+            // defaults
+            if (inputQuantidadeMinima && (inputQuantidadeMinima.value === '' || inputQuantidadeMinima.value == null)) {
+                inputQuantidadeMinima.value = '10';
+            }
         }
     }
 
-    // Mostra o menu principal e esconde outras seções
     function showMainMenu() {
-        mainMenu.classList.remove('hidden');
+        if (mainMenu) mainMenu.classList.remove('hidden');
+        if (adicionarSection) adicionarSection.classList.add('hidden');
+        if (editarSection) editarSection.classList.add('hidden');
+        if (consultarSection) consultarSection.classList.add('hidden');
+        if (excluirSection) excluirSection.classList.add('hidden');
+        if (itemsList) itemsList.classList.remove('hidden');
+        loadItems();
+    }
+
+    // Menu actions (guards for buttons)
+    if (btnAdicionar) btnAdicionar.addEventListener('click', () => {
+        if (mainMenu) mainMenu.classList.add('hidden');
+        if (adicionarSection) adicionarSection.classList.remove('hidden');
+        if (editarSection) editarSection.classList.add('hidden');
+        if (consultarSection) consultarSection.classList.add('hidden');
+        if (excluirSection) excluirSection.classList.add('hidden');
+        if (itemsList) itemsList.classList.add('hidden');
+
+        if (formAdicionar) formAdicionar.reset();
+        if (currentTab === 'medicamentos' && inputQuantidadeMinima) inputQuantidadeMinima.value = '10';
+    });
+
+    // Load items and listen for changes
+    function loadItems() {
+        if (!userUid) return;
+        if (itemsRefListener) itemsRefListener.off();
+
+        const ref = database.ref(`user-estoque/${userUid}/${currentTab}`);
+        itemsRefListener = ref;
+        ref.on('value', snapshot => {
+            allItems = [];
+            if (!snapshot.exists()) {
+                renderItems([]);
+                updateResumo();
+                return;
+            }
+            snapshot.forEach(child => {
+                const key = child.key;
+                if (key === 'historico') return; // ignora nó histórico
+                allItems.push({ id: key, ...child.val() });
+            });
+            renderItems(allItems, false);
+            updateResumo();
+        }, err => {
+            console.error('Erro carregando itens:', err);
+        });
+    }
+
+    // Render list
+    function renderItems(items, forDelete = false) {
+        itemsList.innerHTML = '';
+        itemsList.classList.remove('hidden');
+
+        if (!items || items.length === 0) {
+            itemsList.innerHTML = '<div class="empty-state"><p>Nenhum item encontrado.</p></div>';
+            return;
+        }
+
+        items.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'estoque-item-card';
+            card.dataset.id = item.id;
+
+            let inner = `<h4>${item.nome || '-'}</h4>`;
+            if (currentTab === 'racao') {
+                inner += `<p>Quantidade: ${item.quantidade || '-'}</p>`;
+                inner += `<p>Tipo: ${item.tipo || '-'}</p>`;
+            } else {
+                inner += `<p>Quantidade: ${item.quantidade != null ? item.quantidade : '-'}</p>`;
+                inner += `<p>Quantidade mínima: ${item.quantidadeMinima != null ? item.quantidadeMinima : '-'}</p>`;
+                inner += `<p>Validade: ${item.dataValidade || '-'}</p>`;
+                inner += `<p>Tipo: ${item.tipo || '-'}</p>`;
+            }
+
+            inner += `<div class="item-actions">`;
+            inner += `<button class="btn-edit" data-id="${item.id}">Editar</button>`;
+            inner += `<button class="btn-delete" data-id="${item.id}">Excluir</button>`;
+            inner += `</div>`;
+
+            card.innerHTML = inner;
+            itemsList.appendChild(card);
+        });
+
+        // attach action handlers
+        itemsList.querySelectorAll('.btn-edit').forEach(b => {
+            b.addEventListener('click', (e) => {
+                const id = e.currentTarget.dataset.id;
+                openEditForm(id);
+            });
+        });
+        itemsList.querySelectorAll('.btn-delete').forEach(b => {
+            b.addEventListener('click', (e) => {
+                const id = e.currentTarget.dataset.id;
+                confirmarExcluir(id);
+            });
+        });
+    }
+
+    // Adicionar item
+    formAdicionar.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!userUid) return alert('Usuário não autenticado.');
+
+        const nome = (inputNome.value || '').trim();
+        if (!nome) return alert('Preencha o nome.');
+
+        const itemData = {
+            nome,
+            createdAt: firebase.database.ServerValue.TIMESTAMP,
+            createdBy: userName,
+            createdByUid: userUid
+        };
+
+        if (currentTab === 'racao') {
+            const quantidade = (inputQuantidadeRacao.value || '').trim();
+            const tipo = (itemTipoRacao.value || '').trim();
+            if (!quantidade) return alert('Preencha a quantidade da ração.');
+            itemData.quantidade = quantidade;
+            itemData.tipo = tipo;
+        } else {
+            // medicamentos
+            const quantidade = parseInt(inputQuantidadeMedicamento.value, 10);
+            const quantidadeMin = parseInt(inputQuantidadeMinima.value, 10);
+            const dataValidade = inputValidade.value || '';
+            const tipo = (itemTipoMedicamento.value || '').trim();
+
+            if (isNaN(quantidade) || quantidade < 0) return alert('Preencha quantidade válida do medicamento.');
+            if (isNaN(quantidadeMin) || quantidadeMin < 0) return alert('Preencha quantidade mínima válida.');
+            if (!dataValidade) return alert('Preencha a data de validade.');
+            if (!tipo) return alert('Selecione o tipo do medicamento.');
+
+            itemData.quantidade = quantidade;
+            itemData.quantidadeMinima = quantidadeMin;
+            itemData.dataValidade = dataValidade; // yyyy-mm-dd
+            itemData.tipo = tipo;
+        }
+
+        const newKey = database.ref().child(`user-estoque/${userUid}/${currentTab}`).push().key;
+        const updates = {};
+        updates[`user-estoque/${userUid}/${currentTab}/${newKey}`] = itemData;
+
+        database.ref().update(updates)
+            .then(() => {
+                registrarMovimentacao(currentTab, nome, itemData.quantidade, 'entrada');
+                alert('Item adicionado com sucesso.');
+                formAdicionar.reset();
+                if (currentTab === 'medicamentos') inputQuantidadeMinima.value = '10';
+                loadItems();
+                showMainMenu();
+            })
+            .catch(err => {
+                console.error('Erro ao salvar item:', err);
+                alert('Erro ao salvar item: ' + (err.message || err));
+            });
+    });
+
+    // Abrir edição
+    function openEditForm(itemId) {
+        const item = allItems.find(i => i.id === itemId);
+        if (!item) return alert('Item não encontrado.');
+        editId.value = itemId;
+        editNome.value = item.nome || '';
+        if (currentTab === 'racao') {
+            editQuantidadeRacao.value = item.quantidade || '';
+            editItemTipoRacao.value = item.tipo || '';
+        } else {
+            editQuantidadeMedicamento.value = item.quantidade != null ? item.quantidade : '';
+            editQuantidadeMinima.value = item.quantidadeMinima != null ? item.quantidadeMinima : '';
+            editValidade.value = item.dataValidade || '';
+            editItemTipoMedicamento.value = item.tipo || '';
+        }
+        mainMenu.classList.add('hidden');
         adicionarSection.classList.add('hidden');
-        editarSection.classList.add('hidden');
+        editarSection.classList.remove('hidden');
         consultarSection.classList.add('hidden');
         excluirSection.classList.add('hidden');
         itemsList.classList.add('hidden');
     }
 
-    // Navegação do menu
-    btnAdicionar.addEventListener('click', () => {
-        mainMenu.classList.add('hidden');
-        adicionarSection.classList.remove('hidden');
-        formAdicionar.reset();
-        
-        // Define valor padrão para quantidade mínima
-        if (currentTab === 'medicamentos') {
-            document.getElementById('item-quantidade-minima').value = 10;
-        }
-    });
-
-    btnConsultar.addEventListener('click', () => {
-        mainMenu.classList.add('hidden');
-        consultarSection.classList.remove('hidden');
-        itemsList.classList.remove('hidden');
-        renderItems(allItems, false, true); // modo consulta com editar
-    });
-
-    btnExcluir.addEventListener('click', () => {
-        if (allItems.length === 0) {
-            alert('Não há itens para excluir.');
-            return;
-        }
-        mainMenu.classList.add('hidden');
-        itemsList.classList.remove('hidden');
-        renderItems(allItems, true); // modo exclusão
-    });
-
-    // Botão cancelar edição
-    btnCancelarEdicao.addEventListener('click', () => {
-        showMainMenu();
-    });
-
-    // Função para registrar movimentação no histórico
-    function registrarMovimentacao(tipo, itemNome, quantidade, acao) {
-        const movimentacao = {
-            tipo: tipo,
-            itemNome: itemNome,
-            quantidade: quantidade,
-            acao: acao, // 'entrada' ou 'saida'
-            usuario: userName,
-            userId: userUid,
-            timestamp: firebase.database.ServerValue.TIMESTAMP,
-            data: new Date().toISOString()
-        };
-        
-        database.ref(`user-estoque/${userUid}/historico`).push(movimentacao);
-    }
-
-    // Ajusta o estoque de um item (entrada/saída)
-    function ajustarEstoque(itemId, delta) {
-        const item = allItems.find(i => i.id === itemId);
-        if (!item) return alert('Item não encontrado.');
-
-        // Tenta extrair um número da quantidade atual
-        let quantidadeAtual = item.quantidade || 0;
-        if (typeof quantidadeAtual === 'string') {
-            const parsed = parseInt(quantidadeAtual.replace(/[^0-9-]/g, ''), 10);
-            quantidadeAtual = isNaN(parsed) ? 0 : parsed;
-        } else {
-            quantidadeAtual = Number(quantidadeAtual) || 0;
-        }
-
-        let novaQuantidade = quantidadeAtual + delta;
-        if (novaQuantidade < 0) novaQuantidade = 0;
-
-        database.ref(`user-estoque/${userUid}/${currentTab}/${itemId}`).update({ quantidade: novaQuantidade })
-            .then(() => {
-                registrarMovimentacao(currentTab, item.nome, Math.abs(delta), delta > 0 ? 'entrada' : 'saida');
-                alert('Estoque atualizado com sucesso!');
-                loadItems();
-            })
-            .catch(err => {
-                console.error('Erro ao ajustar estoque:', err);
-                alert('Erro ao ajustar estoque: ' + (err.message || err));
-            });
-    }
-
-    // Formulário de adicionar
-    formAdicionar.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        console.log('Formulário submetido!'); // Debug
-        
-        const nome = document.getElementById('item-nome').value.trim();
-        
-        if (!nome) {
-            alert('Por favor, preencha o nome do item.');
-            return;
-        }
-        
-        let itemData = {
-            nome: nome,
-            categoria: currentTab,
-            createdAt: firebase.database.ServerValue.TIMESTAMP,
-            createdBy: userName,
-            createdByUid: userUid
-        };
-        
-        if (currentTab === 'racao') {
-            const quantidade = document.getElementById('item-quantidade').value.trim();
-            const tipo = itemTipoRacao.value.trim();
-            
-            if (!quantidade || !tipo) {
-                alert('Por favor, preencha todos os campos.');
-                return;
-            }
-            
-            itemData.quantidade = quantidade;
-            itemData.tipo = tipo;
-            
-            console.log('Dados da ração:', itemData); // Debug
-        } else {
-            // Medicamentos
-            const quantidadeMed = document.getElementById('item-quantidade-medicamento').value;
-            const quantidadeMin = document.getElementById('item-quantidade-minima').value || '10';
-            const validade = document.getElementById('item-validade').value;
-            const tipo = itemTipoMedicamento.value;
-            
-            console.log('Valores medicamentos:', {quantidadeMed, quantidadeMin, validade, tipo}); // Debug
-            
-            if (!quantidadeMed || !validade || !tipo) {
-                alert('Por favor, preencha todos os campos obrigatórios (Nome, Quantidade, Validade e Tipo).');
-                return;
-            }
-            
-            itemData.quantidade = parseInt(quantidadeMed);
-            itemData.quantidadeMinima = parseInt(quantidadeMin);
-            itemData.unidade = 'unidades';
-            itemData.dataValidade = validade;
-            itemData.tipo = tipo;
-            
-            console.log('Dados do medicamento:', itemData); // Debug
-        }
-        
-        const newItemKey = database.ref().child(`user-estoque/${userUid}/${currentTab}`).push().key;
-        
-        console.log('Salvando no Firebase...', newItemKey); // Debug
-        
-        database.ref(`user-estoque/${userUid}/${currentTab}/${newItemKey}`).set(itemData)
-            .then(() => {
-                console.log('Salvo com sucesso!'); // Debug
-                // Registra no histórico
-                registrarMovimentacao(
-                    currentTab,
-                    nome,
-                    itemData.quantidade,
-                    'entrada'
-                );
-                
-                alert(`${currentTab === 'racao' ? 'Ração' : 'Medicamento'} adicionado com sucesso!`);
-                formAdicionar.reset();
-                
-                // Define valor padrão novamente após reset
-                if (currentTab === 'medicamentos') {
-                    document.getElementById('item-quantidade-minima').value = '10';
-                }
-                
-                loadItems();
-                showMainMenu();
-            })
-            .catch(error => {
-                console.error('Erro ao adicionar item:', error);
-                alert('Erro ao adicionar item: ' + error.message);
-            });
-    });
-
-    // Formulário de editar
+    // Editar submit
     formEditar.addEventListener('submit', (e) => {
         e.preventDefault();
-        
-        const itemId = document.getElementById('edit-item-id').value;
-        const nome = document.getElementById('edit-item-nome').value.trim();
-        
-        if (!itemId || !nome) {
-            alert('Erro ao editar item.');
-            return;
-        }
-        
-        let itemData = {
-            nome: nome,
+        if (!userUid) return alert('Usuário não autenticado.');
+        const itemId = editId.value;
+        const nome = (editNome.value || '').trim();
+        if (!itemId || !nome) return alert('Erro: dados inválidos.');
+
+        const itemData = {
+            nome,
             updatedAt: firebase.database.ServerValue.TIMESTAMP,
             updatedBy: userName,
             updatedByUid: userUid
         };
-        
+
         if (currentTab === 'racao') {
-            const quantidade = document.getElementById('edit-item-quantidade').value.trim();
-            const tipo = editItemTipoRacao.value.trim();
-            
+            const quantidade = (editQuantidadeRacao.value || '').trim();
+            const tipo = (editItemTipoRacao.value || '').trim();
             itemData.quantidade = quantidade;
             itemData.tipo = tipo;
         } else {
-            const quantidadeMed = document.getElementById('edit-item-quantidade-medicamento').value;
-            const quantidadeMin = document.getElementById('edit-item-quantidade-minima').value;
-            const validade = document.getElementById('edit-item-validade').value;
-            const tipo = editItemTipoMedicamento.value;
-            
-            itemData.quantidade = parseInt(quantidadeMed);
-            itemData.quantidadeMinima = parseInt(quantidadeMin);
-            itemData.dataValidade = validade;
+            const quantidade = parseInt(editQuantidadeMedicamento.value, 10);
+            const quantidadeMin = parseInt(editQuantidadeMinima.value, 10);
+            const dataValidade = editValidade.value || '';
+            const tipo = (editItemTipoMedicamento.value || '').trim();
+
+            if (isNaN(quantidade) || quantidade < 0) return alert('Quantidade inválida.');
+            if (isNaN(quantidadeMin) || quantidadeMin < 0) return alert('Quantidade mínima inválida.');
+            if (!dataValidade) return alert('Preencha a validade.');
+            if (!tipo) return alert('Selecione o tipo.');
+
+            itemData.quantidade = quantidade;
+            itemData.quantidadeMinima = quantidadeMin;
+            itemData.dataValidade = dataValidade;
             itemData.tipo = tipo;
         }
-        
+
         database.ref(`user-estoque/${userUid}/${currentTab}/${itemId}`).update(itemData)
             .then(() => {
-                alert('Item atualizado com sucesso!');
+                alert('Item atualizado com sucesso.');
                 loadItems();
                 showMainMenu();
             })
-            .catch(error => {
-                console.error('Erro ao atualizar:', error);
-                alert('Erro ao atualizar item: ' + error.message);
+            .catch(err => {
+                console.error('Erro ao atualizar:', err);
+                alert('Erro ao atualizar item: ' + (err.message || err));
             });
     });
 
-    // Função para editar item
-    function editarItem(itemId) {
-        const item = allItems.find(i => i.id === itemId);
-        if (!item) return;
-        
-        // Esconde tudo e mostra seção de editar
-        mainMenu.classList.add('hidden');
-        consultarSection.classList.add('hidden');
-        itemsList.classList.add('hidden');
-        editarSection.classList.remove('hidden');
-        
-        // Preenche o formulário
-        document.getElementById('edit-item-id').value = itemId;
-        document.getElementById('edit-item-nome').value = item.nome;
-        
-        if (currentTab === 'racao') {
-            document.getElementById('edit-item-quantidade').value = item.quantidade;
-            editItemTipoRacao.value = item.tipo;
-        } else {
-            document.getElementById('edit-item-quantidade-medicamento').value = item.quantidade;
-            document.getElementById('edit-item-quantidade-minima').value = item.quantidadeMinima || 10;
-            document.getElementById('edit-item-validade').value = item.dataValidade;
-            editItemTipoMedicamento.value = item.tipo;
-        }
-    }
-
-    // Filtrar itens
-    btnFiltrar.addEventListener('click', () => {
-        const filtroNome = document.getElementById('filtro-nome').value.toLowerCase().trim();
-        
-        let filtered = allItems;
-        
-        if (currentTab === 'racao') {
-            const filtroTipo = filtroTipoRacao.value.toLowerCase().trim();
-            
-            filtered = allItems.filter(item => {
-                const matchNome = !filtroNome || item.nome.toLowerCase().includes(filtroNome);
-                const matchTipo = !filtroTipo || item.tipo.toLowerCase().includes(filtroTipo);
-                return matchNome && matchTipo;
-            });
-        } else {
-            // Medicamentos
-            const filtroTipo = filtroTipoMedicamento.value;
-            const filtroQtdMin = document.getElementById('filtro-quantidade-min').value;
-            const filtroValidade = document.getElementById('filtro-validade').value;
-            const filtroEstoque = document.getElementById('filtro-estoque').value;
-            
-            filtered = allItems.filter(item => {
-                const matchNome = !filtroNome || item.nome.toLowerCase().includes(filtroNome);
-                const matchTipo = !filtroTipo || item.tipo === filtroTipo;
-                const matchQtd = !filtroQtdMin || item.quantidade >= parseInt(filtroQtdMin);
-                
-                let matchValidade = true;
-                if (filtroValidade) {
-                    const status = getValidadeStatus(item.dataValidade);
-                    if (filtroValidade === 'valido') matchValidade = status === 'valido';
-                    else if (filtroValidade === 'proximo') matchValidade = status === 'proximo';
-                    else if (filtroValidade === 'vencido') matchValidade = status === 'vencido';
-                }
-                
-                let matchEstoque = true;
-                if (filtroEstoque) {
-                    const statusEstoque = getEstoqueStatus(item.quantidade, item.quantidadeMinima);
-                    if (filtroEstoque === 'esgotado') matchEstoque = statusEstoque === 'esgotado';
-                    else if (filtroEstoque === 'baixo') matchEstoque = statusEstoque === 'baixo';
-                    else if (filtroEstoque === 'normal') matchEstoque = statusEstoque === 'normal';
-                }
-                
-                return matchNome && matchTipo && matchQtd && matchValidade && matchEstoque;
-            });
-        }
-        
-        renderItems(filtered, false, true);
-    });
-
-    // Verifica o status da validade
-    function getValidadeStatus(dataValidade) {
-        if (!dataValidade) return 'valido';
-        
-        const hoje = new Date();
-        hoje.setHours(0, 0, 0, 0);
-        
-        const validade = new Date(dataValidade + 'T00:00:00');
-        const diferenca = validade - hoje;
-        const diasRestantes = Math.ceil(diferenca / (1000 * 60 * 60 * 24));
-        
-        if (diasRestantes < 0) return 'vencido';
-        if (diasRestantes <= 30) return 'proximo';
-        return 'valido';
-    }
-
-    // Verifica o status do estoque
-    function getEstoqueStatus(quantidade, quantidadeMinima = 10) {
-        if (quantidade === 0) return 'esgotado';
-        if (quantidade <= quantidadeMinima) return 'baixo';
-        return 'normal';
-    }
-
-    // Formata a data para exibição
-    function formatarData(dataString) {
-        if (!dataString) return '';
-        const data = new Date(dataString + 'T00:00:00');
-        return data.toLocaleDateString('pt-BR');
-    }
-
-    // Carregar itens do Firebase
-    function loadItems() {
-        if (!userUid) return;
-        
-        const itemsRef = database.ref(`user-estoque/${userUid}/${currentTab}`);
-        
-        itemsRef.on('value', (snapshot) => {
-            allItems = [];
-            
-            if (snapshot.exists()) {
-                snapshot.forEach(childSnapshot => {
-                    allItems.push({
-                        id: childSnapshot.key,
-                        ...childSnapshot.val()
-                    });
-                });
-            }
-            
-            updateResumo();
-        });
-    }
-
-    // Renderizar itens na lista
-    function renderItems(items, deleteMode = false, editMode = false) {
-        itemsList.innerHTML = '';
-        
-        if (items.length === 0) {
-            itemsList.innerHTML = '<div class="empty-state"><p>Nenhum item encontrado</p></div>';
-            return;
-        }
-        
-        items.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'estoque-card';
-            
-            // Adiciona classes de cor para medicamentos
-            if (currentTab === 'medicamentos') {
-                if (item.dataValidade) {
-                    const statusValidade = getValidadeStatus(item.dataValidade);
-                    if (statusValidade === 'vencido') card.classList.add('card-vencido');
-                    else if (statusValidade === 'proximo') card.classList.add('card-proximo-vencimento');
-                }
-                
-                const statusEstoque = getEstoqueStatus(item.quantidade, item.quantidadeMinima);
-                if (statusEstoque === 'esgotado') card.classList.add('card-esgotado');
-                else if (statusEstoque === 'baixo') card.classList.add('card-estoque-baixo');
-            }
-            
-            let infoHTML = `
-                <div class="estoque-info">
-                    <h3>${item.nome}</h3>
-                    <p>Quantidade: ${item.quantidade}${item.unidade ? ' ' + item.unidade : ''}</p>
-                    <p>Tipo: ${item.tipo}</p>
-            `;
-            
-            if (currentTab === 'medicamentos') {
-                // Alertas de estoque
-                const statusEstoque = getEstoqueStatus(item.quantidade, item.quantidadeMinima);
-                if (statusEstoque === 'esgotado') {
-                    infoHTML += `<p style="color:#d32f2f;font-weight:bold;">⚠️ ESGOTADO</p>`;
-                } else if (statusEstoque === 'baixo') {
-                    infoHTML += `<p style="color:#f57c00;font-weight:bold;">⚠️ ESTOQUE BAIXO (Mín: ${item.quantidadeMinima || 10})</p>`;
-                }
-                
-                // Alertas de validade
-                if (item.dataValidade) {
-                    const statusValidade = getValidadeStatus(item.dataValidade);
-                    let statusTexto = '';
-                    
-                    if (statusValidade === 'vencido') statusTexto = ' ⚠️ VENCIDO';
-                    else if (statusValidade === 'proximo') statusTexto = ' ⚠️ Vence em breve';
-                    
-                    infoHTML += `<p>Validade: ${formatarData(item.dataValidade)}${statusTexto}</p>`;
-                }
-            }
-            
-            infoHTML += '</div>';
-            
-            let botoesHTML = '';
-            if (deleteMode) {
-                botoesHTML = `<button class="btn-delete-item" data-id="${item.id}">🗑️</button>`;
-            } else if (editMode) {
-                botoesHTML = `<button class="btn-edit-item" data-id="${item.id}">✏️</button>`;
-            } else {
-                // Em modo normal, exibimos ações rápidas: Entrada (+), Saída (-) e Editar
-                botoesHTML = `
-                    <div class="estoque-actions">
-                        <button class="btn-mov btn-entrada" data-id="${item.id}" title="Entrada">➕</button>
-                        <button class="btn-mov btn-saida" data-id="${item.id}" title="Saída">➖</button>
-                        <button class="btn-edit-item" data-id="${item.id}" title="Editar">✏️</button>
-                    </div>
-                `;
-            }
-            
-            card.innerHTML = infoHTML + botoesHTML;
-            
-            if (deleteMode) {
-                card.querySelector('.btn-delete-item').addEventListener('click', () => {
-                    selectedItemForDelete = item.id;
-                    itemsList.classList.add('hidden');
-                    excluirSection.classList.remove('hidden');
-                });
-            } else if (editMode) {
-                card.querySelector('.btn-edit-item').addEventListener('click', () => {
-                    editarItem(item.id);
-                });
-            } else {
-                // listeners para entrada/saída e editar
-                const btnEntrada = card.querySelector('.btn-entrada');
-                const btnSaida = card.querySelector('.btn-saida');
-                const btnEditar = card.querySelector('.btn-edit-item');
-
-                if (btnEntrada) {
-                    btnEntrada.addEventListener('click', () => {
-                        // Pergunta ao usuário a quantidade a adicionar
-                        const valor = prompt('Quantidade a adicionar:');
-                        const qtd = parseInt(valor);
-                        if (isNaN(qtd) || qtd <= 0) return alert('Quantidade inválida.');
-                        ajustarEstoque(item.id, qtd);
-                    });
-                }
-
-                if (btnSaida) {
-                    btnSaida.addEventListener('click', () => {
-                        const valor = prompt('Quantidade a remover:');
-                        const qtd = parseInt(valor);
-                        if (isNaN(qtd) || qtd <= 0) return alert('Quantidade inválida.');
-                        ajustarEstoque(item.id, -qtd);
-                    });
-                }
-
-                if (btnEditar) {
-                    btnEditar.addEventListener('click', () => {
-                        editarItem(item.id);
-                    });
-                }
-            }
-            
-            itemsList.appendChild(card);
-        });
-    }
-
-    // Confirmar exclusão
-    btnExcluirSim.addEventListener('click', () => {
-        if (!selectedItemForDelete) return;
-        
-        // Busca o item para registrar no histórico
-        const item = allItems.find(i => i.id === selectedItemForDelete);
-        
-        database.ref(`user-estoque/${userUid}/${currentTab}/${selectedItemForDelete}`).remove()
+    // Excluir
+    function confirmarExcluir(itemId) {
+        if (!confirm('Confirma exclusão deste item?')) return;
+        database.ref(`user-estoque/${userUid}/${currentTab}/${itemId}`).remove()
             .then(() => {
-                // Registra no histórico
-                if (item) {
-                    registrarMovimentacao(
-                        currentTab,
-                        item.nome,
-                        item.quantidade,
-                        'saida'
-                    );
-                }
-                
-                alert('Item excluído com sucesso!');
-                selectedItemForDelete = null;
+                alert('Item excluído.');
+                registrarMovimentacao(currentTab, `Exclusão:${itemId}`, 0, 'exclusao');
                 loadItems();
-                showMainMenu();
             })
-            .catch(error => {
-                console.error('Erro ao excluir:', error);
-                alert('Erro ao excluir item.');
+            .catch(err => {
+                console.error('Erro ao excluir:', err);
+                alert('Erro ao excluir item: ' + (err.message || err));
             });
-    });
+    }
 
-    // Cancelar exclusão
-    btnExcluirNao.addEventListener('click', () => {
-        selectedItemForDelete = null;
-        showMainMenu();
-    });
+    // Movimentações
+    function registrarMovimentacao(categoria, itemNome, quantidade, acao) {
+        const histRef = database.ref(`user-estoque/${userUid}/historico`);
+        const entry = {
+            categoria,
+            itemNome,
+            quantidade,
+            acao,
+            usuario: userName,
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            data: new Date().toISOString()
+        };
+        histRef.push(entry).catch(err => console.error('Erro registrando histórico:', err));
+    }
 
-    // Atualizar resumo
+    // Resumo
+    function parseQuantity(q) {
+        if (q == null) return 0;
+        if (typeof q === 'number') return q;
+        const s = String(q);
+        const parsed = parseInt(s.replace(/[^0-9-]/g, ''), 10);
+        return isNaN(parsed) ? 0 : parsed;
+    }
+
     function updateResumo() {
-        const total = allItems.length;
-        totalUnidades.textContent = total;
-        
-        // Carrega o histórico
+        const totalUnits = allItems.reduce((acc, item) => acc + parseQuantity(item.quantidade), 0);
+        totalUnidades.textContent = totalUnits;
+
+        // carregar últimas movimentações
         database.ref(`user-estoque/${userUid}/historico`).orderByChild('timestamp').limitToLast(10).once('value')
             .then(snapshot => {
-                let historicoHTML = '<p><strong>Últimas movimentações:</strong></p>';
-                let movimentacoes = [];
-                
-                snapshot.forEach(childSnapshot => {
-                    movimentacoes.unshift(childSnapshot.val());
+                let html = '<p><strong>Últimas movimentações:</strong></p>';
+                const movs = [];
+                snapshot.forEach(s => movs.push(s.val()));
+                movs.reverse().forEach(m => {
+                    const simbolo = m.acao === 'entrada' ? '➕' : (m.acao === 'exclusao' ? '🗑️' : '➖');
+                    const data = new Date(m.data || m.timestamp || Date.now());
+                    html += `<p>${simbolo} ${m.itemNome} - ${m.quantidade} (${m.usuario}) - ${data.toLocaleString()}</p>`;
                 });
-                
-                if (movimentacoes.length > 0) {
-                    movimentacoes.forEach(mov => {
-                        const cor = mov.acao === 'entrada' ? '#4caf50' : '#f44336';
-                        const simbolo = mov.acao === 'entrada' ? '➕' : '➖';
-                        const data = new Date(mov.data);
-                        const dataFormatada = data.toLocaleDateString('pt-BR') + ' ' + data.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
-                        
-                        historicoHTML += `<p style="color:${cor};"><strong>${simbolo} ${mov.itemNome}</strong> - ${mov.quantidade} (${mov.usuario}) - ${dataFormatada}</p>`;
-                    });
-                } else {
-                    historicoHTML += '<p>Nenhuma movimentação registrada.</p>';
-                }
-                
-                let detalhes = '<p><strong>Estoque atual:</strong></p>';
-                
-                if (currentTab === 'medicamentos') {
-                    let vencidos = 0;
-                    let proximos = 0;
-                    let esgotados = 0;
-                    let baixos = 0;
-                    
-                    allItems.forEach(item => {
-                        const statusValidade = getValidadeStatus(item.dataValidade);
-                        const statusEstoque = getEstoqueStatus(item.quantidade, item.quantidadeMinima);
-                        
-                        if (statusValidade === 'vencido') vencidos++;
-                        else if (statusValidade === 'proximo') proximos++;
-                        
-                        if (statusEstoque === 'esgotado') esgotados++;
-                        else if (statusEstoque === 'baixo') baixos++;
-                        
-                        detalhes += `<p>• ${item.nome} - ${item.quantidade} ${item.unidade || ''}`;
-                        if (item.dataValidade) {
-                            detalhes += ` (Val: ${formatarData(item.dataValidade)})`;
-                        }
-                        detalhes += '</p>';
-                    });
-                    
-                    if (vencidos > 0 || proximos > 0 || esgotados > 0 || baixos > 0) {
-                        let alertas = '<p><strong>Alertas:</strong></p>';
-                        if (esgotados > 0) alertas += `<p style="color:#d32f2f;font-weight:bold;">⚠️ ${esgotados} medicamento(s) esgotado(s)</p>`;
-                        if (baixos > 0) alertas += `<p style="color:#f57c00;font-weight:bold;">⚠️ ${baixos} medicamento(s) com estoque baixo</p>`;
-                        if (vencidos > 0) alertas += `<p style="color:#d32f2f;font-weight:bold;">⚠️ ${vencidos} medicamento(s) vencido(s)</p>`;
-                        if (proximos > 0) alertas += `<p style="color:#f9a825;font-weight:bold;">⚠️ ${proximos} medicamento(s) próximo(s) ao vencimento</p>`;
-                        detalhes = alertas + detalhes;
-                    }
-                } else {
-                    allItems.forEach(item => {
-                        detalhes += `<p>• ${item.nome} - ${item.quantidade}</p>`;
-                    });
-                }
-                
-                if (total > 0) {
-                    resumoContent.innerHTML = `
-                        <p>Total de itens: <span>${total}</span></p>
-                        ${historicoHTML}
-                        <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
-                        ${detalhes}
-                    `;
-                } else {
-                    resumoContent.innerHTML = '<p>Nenhum item cadastrado ainda.</p>';
-                }
+                resumoContent.innerHTML = `<p>Total de unidades disponíveis: <span id="total-unidades">${totalUnits}</span></p>${html}`;
+            })
+            .catch(err => {
+                console.error('Erro carregando histórico:', err);
             });
     }
 
-    // Busca em tempo real
-    const searchBar = document.getElementById('search-bar');
-    if (searchBar) {
-        searchBar.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase().trim();
-            
-            if (term === '') {
-                renderItems(allItems, false, true);
-            } else {
-                const filtered = allItems.filter(item => 
-                    item.nome.toLowerCase().includes(term) ||
-                    item.tipo.toLowerCase().includes(term)
-                );
-                renderItems(filtered, false, true);
-            }
-        });
-    }
-    
-    // Inicializa os campos corretos
+    // Inicial
+    updateLabels();
     toggleFieldsByTab();
 });

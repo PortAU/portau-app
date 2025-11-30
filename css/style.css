@@ -1457,3 +1457,200 @@ h1 {
     margin: 0 auto 10px auto;
 }
 
+/* ...existing code... */
+
+/* Botões de ação nos cards (Editar e Excluir) */
+.item-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn-edit,
+.btn-delete {
+    flex: 1;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 20px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 0.9em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-edit {
+    background-color: #3a9a6c;
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: #0c6339;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+}
+
+.btn-edit:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
+}
+
+.btn-delete {
+    background-color: #f44336;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #da190b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3);
+}
+
+.btn-delete:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3);
+}
+
+/* ...existing code... */
+
+/* Cards do Estoque */
+.estoque-item-card {
+    background-color: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.estoque-item-card:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+}
+
+.estoque-item-card h4 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.3em;
+}
+
+.estoque-item-card p {
+    margin: 8px 0;
+    color: #555;
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+
+.estoque-item-card p strong {
+    color: #333;
+    font-weight: bold;
+}
+
+/* Container da lista de itens */
+.items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 25px 0;
+    padding: 0 10px;
+}
+
+.items-list.hidden {
+    display: none;
+}
+
+/* Botões dentro do card */
+.item-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.btn-edit,
+.btn-delete {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 20px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 0.95em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-edit {
+    background-color: #3a9a6c;
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: #2d7d56;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(58, 154, 108, 0.3);
+}
+
+.btn-edit:active {
+    transform: translateY(0);
+}
+
+.btn-delete {
+    background-color: #f44336;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #da190b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+}
+
+.btn-delete:active {
+    transform: translateY(0);
+}
+
+/* Estado vazio */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+    font-size: 1.1em;
+    background-color: #f9f9f9;
+    border-radius: 15px;
+    margin: 20px 0;
+}
+
+/* ...existing code... */
+
+/* Botão Adicionar Item */
+#btn-adicionar {
+    display: block;
+    width: 100%;
+    background-color: #FFF;
+    border: 2px solid #333;
+    border-radius: 10px;
+    padding: 12px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2em;
+    cursor: pointer;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    text-align: center;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.2s 
+ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+#btn-adicionar:hover {
+    background-color: #2d7d56;
+    transform: translateY(-2px);
+}
