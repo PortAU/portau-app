@@ -46,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputNome = document.getElementById('item-nome');
     const inputQuantidadeRacao = document.getElementById('item-quantidade');
     const inputQuantidadeMedicamento = document.getElementById('item-quantidade-medicamento');
-    const inputQuantidadeMinima = document.getElementById('item-quantidade-minima');
     const inputValidade = document.getElementById('item-validade');
 
     // Inputs editar
@@ -54,7 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const editNome = document.getElementById('edit-item-nome');
     const editQuantidadeRacao = document.getElementById('edit-item-quantidade');
     const editQuantidadeMedicamento = document.getElementById('edit-item-quantidade-medicamento');
-    const editQuantidadeMinima = document.getElementById('edit-item-quantidade-minima');
     const editValidade = document.getElementById('edit-item-validade');
 
     // Estado
@@ -157,11 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
             groupEditQuantidadeRacao.classList.add('hidden');
             editItemTipoRacao.classList.add('hidden');
             editItemTipoMedicamento.classList.remove('hidden');
-
-            // defaults
-            if (inputQuantidadeMinima && (inputQuantidadeMinima.value === '' || inputQuantidadeMinima.value == null)) {
-                inputQuantidadeMinima.value = '10';
-            }
         }
     }
 
@@ -172,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (consultarSection) consultarSection.classList.add('hidden');
         if (excluirSection) excluirSection.classList.add('hidden');
         if (itemsList) itemsList.classList.remove('hidden');
-        loadItems();
+        // Listener já está ativo, não precisa recarregar
     }
 
     // Menu actions (guards for buttons)
@@ -185,34 +178,49 @@ document.addEventListener('DOMContentLoaded', () => {
         if (itemsList) itemsList.classList.add('hidden');
 
         if (formAdicionar) formAdicionar.reset();
-        if (currentTab === 'medicamentos' && inputQuantidadeMinima) inputQuantidadeMinima.value = '10';
     });
 
     // Load items and listen for changes
+    // Load items and listen for changes
     function loadItems() {
         if (!userUid) return;
-        if (itemsRefListener) itemsRefListener.off();
+        
+        // Desliga listener anterior ANTES de criar um novo
+        if (itemsRefListener) {
+            itemsRefListener.off('value');
+        }
 
         const ref = database.ref(`user-estoque/${userUid}/${currentTab}`);
-        itemsRefListener = ref;
+        
+        // Configura o novo listener
         ref.on('value', snapshot => {
+            console.log(`📥 Dados carregados para ${currentTab}:`, snapshot.numChildren());
             allItems = [];
+            
             if (!snapshot.exists()) {
+                console.log(`ℹ️ Nenhum item encontrado para ${currentTab}`);
                 renderItems([]);
                 updateResumo();
                 return;
             }
+            
             snapshot.forEach(child => {
                 const key = child.key;
-                if (key === 'historico') return; // ignora nó histórico
+                // Ignora nós especiais que não são itens
+                if (key === 'historico') return;
                 allItems.push({ id: key, ...child.val() });
             });
+            
+            console.log(`✅ ${allItems.length} itens carregados`);
             // Aplica filtro de busca (se houver) ou renderiza tudo
             applySearchFilter();
             updateResumo();
         }, err => {
-            console.error('Erro carregando itens:', err);
+            console.error('❌ Erro carregando itens:', err);
         });
+        
+        // Guarda referência para poder desligar depois
+        itemsRefListener = ref;
     }
 
     // Render list
@@ -236,7 +244,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 inner += `<p>Tipo: ${item.tipo || '-'}</p>`;
             } else {
                 inner += `<p>Quantidade: ${item.quantidade != null ? item.quantidade : '-'}</p>`;
-                inner += `<p>Quantidade mínima: ${item.quantidadeMinima != null ? item.quantidadeMinima : '-'}</p>`;
                 inner += `<p>Validade: ${item.dataValidade || '-'}</p>`;
                 inner += `<p>Tipo: ${item.tipo || '-'}</p>`;
             }
@@ -281,25 +288,22 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         if (currentTab === 'racao') {
-            const quantidade = (inputQuantidadeRacao.value || '').trim();
+            const quantidade = parseInt(inputQuantidadeRacao.value, 10);
             const tipo = (itemTipoRacao.value || '').trim();
-            if (!quantidade) return alert('Preencha a quantidade da ração.');
+            if (isNaN(quantidade) || quantidade < 0) return alert('Preencha quantidade válida da ração.');
             itemData.quantidade = quantidade;
             itemData.tipo = tipo;
         } else {
             // medicamentos
             const quantidade = parseInt(inputQuantidadeMedicamento.value, 10);
-            const quantidadeMin = parseInt(inputQuantidadeMinima.value, 10);
             const dataValidade = inputValidade.value || '';
             const tipo = (itemTipoMedicamento.value || '').trim();
 
             if (isNaN(quantidade) || quantidade < 0) return alert('Preencha quantidade válida do medicamento.');
-            if (isNaN(quantidadeMin) || quantidadeMin < 0) return alert('Preencha quantidade mínima válida.');
             if (!dataValidade) return alert('Preencha a data de validade.');
             if (!tipo) return alert('Selecione o tipo do medicamento.');
 
             itemData.quantidade = quantidade;
-            itemData.quantidadeMinima = quantidadeMin;
             itemData.dataValidade = dataValidade; // yyyy-mm-dd
             itemData.tipo = tipo;
         }
@@ -310,10 +314,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         database.ref().update(updates)
             .then(() => {
+                // Tenta registrar movimentação, mas não bloqueia o sucesso do item
                 registrarMovimentacao(currentTab, nome, itemData.quantidade, 'entrada');
                 alert('Item adicionado com sucesso.');
                 formAdicionar.reset();
-                if (currentTab === 'medicamentos') inputQuantidadeMinima.value = '10';
                 loadItems();
                 showMainMenu();
             })
@@ -334,7 +338,6 @@ document.addEventListener('DOMContentLoaded', () => {
             editItemTipoRacao.value = item.tipo || '';
         } else {
             editQuantidadeMedicamento.value = item.quantidade != null ? item.quantidade : '';
-            editQuantidadeMinima.value = item.quantidadeMinima != null ? item.quantidadeMinima : '';
             editValidade.value = item.dataValidade || '';
             editItemTipoMedicamento.value = item.tipo || '';
         }
@@ -354,6 +357,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const nome = (editNome.value || '').trim();
         if (!itemId || !nome) return alert('Erro: dados inválidos.');
 
+        // Busca o item anterior para comparação e registro de mudanças
+        const itemAnterior = allItems.find(i => i.id === itemId);
+
         const itemData = {
             nome,
             updatedAt: firebase.database.ServerValue.TIMESTAMP,
@@ -361,30 +367,53 @@ document.addEventListener('DOMContentLoaded', () => {
             updatedByUid: userUid
         };
 
+        let quantidadeNova = 0;
+        let mudancas = [];
+
         if (currentTab === 'racao') {
-            const quantidade = (editQuantidadeRacao.value || '').trim();
+            const quantidade = parseInt(editQuantidadeRacao.value, 10);
             const tipo = (editItemTipoRacao.value || '').trim();
+            if (isNaN(quantidade) || quantidade < 0) return alert('Quantidade inválida.');
             itemData.quantidade = quantidade;
             itemData.tipo = tipo;
+            quantidadeNova = quantidade;
+
+            if (itemAnterior.quantidade !== quantidade) {
+                mudancas.push(`quantidade: ${itemAnterior.quantidade} → ${quantidade}`);
+            }
+            if (itemAnterior.tipo !== tipo) {
+                mudancas.push(`tipo: ${itemAnterior.tipo} → ${tipo}`);
+            }
         } else {
             const quantidade = parseInt(editQuantidadeMedicamento.value, 10);
-            const quantidadeMin = parseInt(editQuantidadeMinima.value, 10);
             const dataValidade = editValidade.value || '';
             const tipo = (editItemTipoMedicamento.value || '').trim();
 
             if (isNaN(quantidade) || quantidade < 0) return alert('Quantidade inválida.');
-            if (isNaN(quantidadeMin) || quantidadeMin < 0) return alert('Quantidade mínima inválida.');
             if (!dataValidade) return alert('Preencha a validade.');
             if (!tipo) return alert('Selecione o tipo.');
 
             itemData.quantidade = quantidade;
-            itemData.quantidadeMinima = quantidadeMin;
             itemData.dataValidade = dataValidade;
             itemData.tipo = tipo;
+            quantidadeNova = quantidade;
+
+            if (itemAnterior.quantidade !== quantidade) {
+                mudancas.push(`quantidade: ${itemAnterior.quantidade} → ${quantidade}`);
+            }
+            if (itemAnterior.dataValidade !== dataValidade) {
+                mudancas.push(`validade: ${itemAnterior.dataValidade} → ${dataValidade}`);
+            }
+            if (itemAnterior.tipo !== tipo) {
+                mudancas.push(`tipo: ${itemAnterior.tipo} → ${tipo}`);
+            }
         }
 
         database.ref(`user-estoque/${userUid}/${currentTab}/${itemId}`).update(itemData)
             .then(() => {
+                // Tenta registrar a edição, mas não bloqueia o sucesso da atualização
+                const descricaoMudancas = mudancas.length > 0 ? mudancas.join('; ') : 'sem alterações';
+                registrarMovimentacao(currentTab, nome, quantidadeNova, 'edicao', descricaoMudancas);
                 alert('Item atualizado com sucesso.');
                 loadItems();
                 showMainMenu();
@@ -398,10 +427,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Excluir
     function confirmarExcluir(itemId) {
         if (!confirm('Confirma exclusão deste item?')) return;
+        
+        // Busca o item para obter o nome antes de deletar
+        const item = allItems.find(i => i.id === itemId);
+        if (!item) return alert('Item não encontrado.');
+        
+        const nomeItem = item.nome;
+        const quantidadeItem = item.quantidade || 0;
+        
         database.ref(`user-estoque/${userUid}/${currentTab}/${itemId}`).remove()
             .then(() => {
+                // Tenta registrar a exclusão, mas não bloqueia o sucesso da remoção
+                registrarMovimentacao(currentTab, nomeItem, quantidadeItem, 'exclusao');
                 alert('Item excluído.');
-                registrarMovimentacao(currentTab, `Exclusão:${itemId}`, 0, 'exclusao');
                 loadItems();
             })
             .catch(err => {
@@ -410,19 +448,57 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
-    // Movimentações
-    function registrarMovimentacao(categoria, itemNome, quantidade, acao) {
+    // Movimentações - Registra operações CRUD com detalhes completos
+    // Nota: Falhas neste registro NÃO devem bloquear a operação principal
+    function registrarMovimentacao(categoria, itemNome, quantidade, acao, descricao = '') {
+        if (!userUid) {
+            console.warn('Não foi possível registrar movimentação: usuário não autenticado');
+            return;
+        }
+        
         const histRef = database.ref(`user-estoque/${userUid}/historico`);
+        
+        // Define emoji e texto descritivo para cada ação
+        let acaoDescrita = '';
+        switch(acao) {
+            case 'entrada':
+                acaoDescrita = 'Adicionado';
+                break;
+            case 'edicao':
+                acaoDescrita = 'Editado';
+                break;
+            case 'exclusao':
+                acaoDescrita = 'Excluído';
+                break;
+            default:
+                acaoDescrita = 'Modificado';
+        }
+        
         const entry = {
             categoria,
             itemNome,
             quantidade,
             acao,
+            acaoDescrita,
+            descricao,
             usuario: userName,
             timestamp: firebase.database.ServerValue.TIMESTAMP,
             data: new Date().toISOString()
         };
-        histRef.push(entry).catch(err => console.error('Erro registrando histórico:', err));
+        
+        console.log('Registrando movimentação:', entry);
+        
+        // Registra de forma assíncrona sem bloquear a operação principal
+        histRef.push(entry)
+            .then((ref) => {
+                console.log(`✓ Histórico registrado com sucesso: ${ref.key}`);
+                // Atualiza a visualização do resumo imediatamente
+                updateResumo();
+            })
+            .catch(err => {
+                console.error('✗ Erro ao registrar histórico:', err.message, err.code);
+                console.warn('Detalhes do erro:', err);
+            });
     }
 
     // Resumo
@@ -438,21 +514,71 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalUnits = allItems.reduce((acc, item) => acc + parseQuantity(item.quantidade), 0);
         totalUnidades.textContent = totalUnits;
 
-        // carregar últimas movimentações
-        database.ref(`user-estoque/${userUid}/historico`).orderByChild('timestamp').limitToLast(10).once('value')
-            .then(snapshot => {
+        // Carrega últimas 15 movimentações com listener (atualiza em tempo real)
+        database.ref(`user-estoque/${userUid}/historico`)
+            .orderByChild('timestamp')
+            .limitToLast(15)
+            .on('value', snapshot => {
                 let html = '<p><strong>Últimas movimentações:</strong></p>';
+                
+                if (!snapshot.exists()) {
+                    html += '<p style="color: #999; font-style: italic;">Nenhuma movimentação registrada ainda.</p>';
+                    resumoContent.innerHTML = `<p><strong>Total de unidades disponíveis: <span id="total-unidades">${totalUnits}</span></strong></p>${html}`;
+                    return;
+                }
+                
+                html += '<div style="max-height: 300px; overflow-y: auto;">';
                 const movs = [];
                 snapshot.forEach(s => movs.push(s.val()));
                 movs.reverse().forEach(m => {
-                    const simbolo = m.acao === 'entrada' ? '➕' : (m.acao === 'exclusao' ? '🗑️' : '➖');
+                    // Verifica se o objeto de movimentação está completo
+                    if (!m || !m.itemNome || !m.acao) {
+                        console.warn('Movimentação inválida:', m);
+                        return;
+                    }
+                    
+                    // Define ícone baseado na ação
+                    let simbolo = '';
+                    let cor = '';
+                    switch(m.acao) {
+                        case 'entrada':
+                            simbolo = '➕';
+                            cor = '#4caf50';
+                            break;
+                        case 'edicao':
+                            simbolo = '✏️';
+                            cor = '#2196f3';
+                            break;
+                        case 'exclusao':
+                            simbolo = '🗑️';
+                            cor = '#f44336';
+                            break;
+                        default:
+                            simbolo = '⚙️';
+                            cor = '#ff9800';
+                    }
+                    
                     const data = new Date(m.data || m.timestamp || Date.now());
-                    html += `<p>${simbolo} ${m.itemNome} - ${m.quantidade} (${m.usuario}) - ${data.toLocaleString()}</p>`;
+                    const horaFormatada = data.toLocaleString('pt-BR');
+                    const categoria = m.categoria === 'racao' ? '(Ração)' : '(Medicamento)';
+                    
+                    // Monta a descrição da movimentação com ou sem detalhes
+                    let descricaoCompleta = `${m.acaoDescrita || m.acao}`;
+                    if (m.descricao) {
+                        descricaoCompleta += `: ${m.descricao}`;
+                    }
+                    
+                    html += `<p style="border-left: 3px solid ${cor}; padding-left: 10px; margin: 8px 0; font-size: 0.9em;">
+                        ${simbolo} <strong>${m.itemNome}</strong> ${categoria} - ${descricaoCompleta} 
+                        <br/><small>Qtd: ${m.quantidade} | ${m.usuario} | ${horaFormatada}</small>
+                    </p>`;
                 });
-                resumoContent.innerHTML = `<p>Total de unidades disponíveis: <span id="total-unidades">${totalUnits}</span></p>${html}`;
-            })
-            .catch(err => {
+                html += '</div>';
+                resumoContent.innerHTML = `<p><strong>Total de unidades disponíveis: <span id="total-unidades">${totalUnits}</span></strong></p>${html}`;
+            }, err => {
                 console.error('Erro carregando histórico:', err);
+                // Se houver erro, mostra pelo menos o total
+                resumoContent.innerHTML = `<p><strong>Total de unidades disponíveis: <span id="total-unidades">${totalUnits}</span></strong></p><p style="color: #f44336;">Erro ao carregar histórico</p>`;
             });
     }
 

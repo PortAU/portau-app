@@ -19,6 +19,7 @@ const db = firebase.database();
 const photoPreview = document.getElementById("pet-photo-preview");
 const btnChangePhoto = document.getElementById("btn-change-photo");
 const inputPhoto = document.getElementById("pet-photo-input");
+const baySelect = document.getElementById("pet-bay");
 
 let currentPhotoBase64 = null;
 let newPhotoBase64 = null;
@@ -35,9 +36,37 @@ firebase.auth().onAuthStateChanged(user => {
 
     userId = user.uid;
 
+    // Carrega as baias disponíveis
+    carregarBaias();
     // Depois de ter o userId → carregar os dados do pet
     carregarPet();
 });
+
+function carregarBaias() {
+    db.ref(`user-baias/${userId}`).once('value')
+        .then((snapshot) => {
+            baySelect.innerHTML = '<option value="">Selecione uma baia</option>';
+            if (snapshot.exists()) {
+                const baias = snapshot.val();
+                for (const baiaId in baias) {
+                    const baia = baias[baiaId];
+                    const option = document.createElement('option');
+                    option.value = baia.nome || baiaId;
+                    option.textContent = baia.nome || 'Sem nome';
+                    baySelect.appendChild(option);
+                }
+            } else {
+                // Se não houver baias, adiciona mensagem e desabilita o select
+                baySelect.innerHTML = '<option value="">Nenhuma baia disponível</option>';
+                baySelect.disabled = true;
+            }
+        })
+        .catch((error) => {
+            console.error('Erro ao carregar baias:', error);
+            baySelect.innerHTML = '<option value="">Erro ao carregar baias</option>';
+            baySelect.disabled = true;
+        });
+}
 
 function carregarPet() {
     db.ref("user-pets/" + userId + "/" + petId)
@@ -52,6 +81,11 @@ function carregarPet() {
 
             // Preenche inputs
             document.getElementById("pet-name").value = pet.nome || "";
+            // Preenche status de adoção (armazenado como booleano)
+            const adoptedSelect = document.getElementById("pet-adopted");
+            if (adoptedSelect) {
+                adoptedSelect.value = (pet.adotado === true || pet.adotado === 'true') ? 'true' : 'false';
+            }
             document.getElementById("pet-sex").value = pet.sexo || "";
             document.getElementById("pet-race").value = pet.raca || "";
             document.getElementById("pet-fur").value = pet.pelagem || "";
@@ -62,11 +96,6 @@ function carregarPet() {
             document.getElementById("pet-birthdate").value = pet.dataNascimento || "";
             document.getElementById("pet-collection-date").value = pet.dataRecolhimento || "";
             document.getElementById("pet-obs").value = pet.observacoes || "";
-            // Preenche status de adoção (armazenado como booleano)
-            const adoptedSelect = document.getElementById("pet-adopted");
-            if (adoptedSelect) {
-                adoptedSelect.value = (pet.adotado === true || pet.adotado === 'true') ? 'true' : 'false';
-            }
 
             if (pet.foto) {
                 currentPhotoBase64 = pet.foto;
@@ -103,6 +132,12 @@ inputPhoto.addEventListener("change", (event) => {
 // =========================
 document.getElementById("edit-pet-form").addEventListener("submit", async (e) => {
     e.preventDefault();
+
+    // Valida se uma baia foi selecionada
+    if (!baySelect.value) {
+        alert('Por favor, selecione uma baia para o pet.');
+        return;
+    }
 
     if (!userId) return alert("Erro de autenticação.");
 

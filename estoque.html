@@ -54,8 +54,8 @@
                     
                     <!-- Campo de Quantidade para ração -->
                     <div class="form-group" id="group-quantidade-racao">
-                        <label>Qtde</label>
-                        <input type="text" id="item-quantidade" placeholder="Ex: 100 kg">
+                        <label>Quantidade (kg)</label>
+                        <input type="number" id="item-quantidade" placeholder="Ex: 100" min="0">
                     </div>
                     
                     <!-- Campos específicos para MEDICAMENTOS -->
@@ -63,10 +63,6 @@
                         <div class="form-group">
                             <label>Quantidade (unidades)</label>
                             <input type="number" id="item-quantidade-medicamento" placeholder="Ex: 50" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Quantidade mínima (alerta)</label>
-                            <input type="number" id="item-quantidade-minima" placeholder="Ex: 10" min="0">
                         </div>
                         <div class="form-group">
                             <label>Data de Validade</label>
@@ -105,17 +101,13 @@
                     
                     <div class="form-group" id="group-edit-quantidade-racao">
                         <label>Quantidade</label>
-                        <input type="text" id="edit-item-quantidade">
+                        <input type="number" id="edit-item-quantidade" min="0">
                     </div>
                     
                     <div id="campos-edit-medicamentos" class="hidden">
                         <div class="form-group">
                             <label>Quantidade (unidades)</label>
                             <input type="number" id="edit-item-quantidade-medicamento" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Quantidade mínima (alerta)</label>
-                            <input type="number" id="edit-item-quantidade-minima" min="0">
                         </div>
                         <div class="form-group">
                             <label>Data de Validade</label>
@@ -168,10 +160,6 @@
                     
                     <!-- Filtros específicos para MEDICAMENTOS -->
                     <div id="filtros-medicamentos" class="hidden">
-                        <div class="form-group">
-                            <label>Quantidade mínima</label>
-                            <input type="number" id="filtro-quantidade-min" placeholder="Ex: 10" min="0">
-                        </div>
                         <div class="form-group">
                             <label>Status da Validade</label>
                             <select id="filtro-validade">

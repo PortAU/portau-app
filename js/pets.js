@@ -5,7 +5,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('.pet-form');
     const fotoInput = document.getElementById('foto');
     const preview = document.getElementById('preview-foto');
+    const baySelect = document.getElementById('pet-bay');
     let fotoBase64 = null; // armazenará a imagem comprimida
+
+    // Carrega as baias disponíveis do usuário
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            const userId = user.uid;
+            firebase.database().ref(`user-baias/${userId}`).once('value')
+                .then((snapshot) => {
+                    baySelect.innerHTML = '<option value="">Selecione uma baia</option>';
+                    if (snapshot.exists()) {
+                        const baias = snapshot.val();
+                        for (const baiaId in baias) {
+                            const baia = baias[baiaId];
+                            const option = document.createElement('option');
+                            option.value = baia.nome || baiaId;
+                            option.textContent = baia.nome || 'Sem nome';
+                            baySelect.appendChild(option);
+                        }
+                    } else {
+                        // Se não houver baias, adiciona mensagem e desabilita o select
+                        baySelect.innerHTML = '<option value="">Nenhuma baia disponível</option>';
+                        baySelect.disabled = true;
+                    }
+                })
+                .catch((error) => {
+                    console.error('Erro ao carregar baias:', error);
+                    baySelect.innerHTML = '<option value="">Erro ao carregar baias</option>';
+                    baySelect.disabled = true;
+                });
+        }
+    });
 
     // PREVIEW + COMPRESSÃO DA IMAGEM
     fotoInput.addEventListener("change", async (e) => {
@@ -27,17 +58,23 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        // Valida se uma baia foi selecionada
+        if (!baySelect.value) {
+            alert('Por favor, selecione uma baia para o pet.');
+            return;
+        }
+
         const userId = auth.currentUser.uid;
         const newPetKey = database.ref().child('pets').push().key;
 
         const petData = {
             nome: form.querySelector('#pet-name').value,
+            adotado: (form.querySelector('#pet-adopted') ? form.querySelector('#pet-adopted').value === 'true' : false),
             sexo: form.querySelector('#pet-sex').value,
             raca: form.querySelector('#pet-race').value,
             pelagem: form.querySelector('#pet-fur').value,
             porte: form.querySelector('#pet-size').value,
             especie: form.querySelector('#pet-species').value,
-            adotado: (form.querySelector('#pet-adopted') ? form.querySelector('#pet-adopted').value === 'true' : false),
             genio: form.querySelector('#pet-temperament').value,
             baia: form.querySelector('#pet-bay').value,
             dataNascimento: form.querySelector('#pet-birthdate').value,
