@@ -31,19 +31,16 @@
         </header>
 
         <main class="main-content with-bottom-nav">
-            <h1 class="page-title">Estoque</h1>
 
             <!-- Abas de Navegação -->
             <div class="tab-navigation">
-                <button class="tab-button active" data-tab="racao">Ração</button>
-                <button class="tab-button" data-tab="medicamentos">Medicamentos</button>
+                <button class="tab-button active" data-tab="racao">RAÇÃO</button>
+                <button class="tab-button" data-tab="medicamentos">MEDICAMENTOS</button>
             </div>
 
             <!-- Menu Principal (visível ao carregar) -->
             <div id="main-menu" class="estoque-menu">
-                <button class="btn-estoque" id="btn-adicionar">ADICIONAR</button>
-                <button class="btn-estoque" id="btn-consultar">CONSULTAR</button>
-                <button class="btn-estoque" id="btn-excluir">EXCLUIR</button>
+                <button id="btn-adicionar" class="estoque-btn btn-primary">+ ADICIONAR ITEM</button>
             </div>
 
             <!-- Seção de Adicionar (oculta inicialmente) -->
@@ -58,22 +55,22 @@
                     <!-- Campo de Quantidade para ração -->
                     <div class="form-group" id="group-quantidade-racao">
                         <label>Qtde</label>
-                        <input type="text" id="item-quantidade" placeholder="Ex: 100 kg" required>
+                        <input type="text" id="item-quantidade" placeholder="Ex: 100 kg">
                     </div>
                     
                     <!-- Campos específicos para MEDICAMENTOS -->
                     <div id="campos-medicamentos" class="hidden">
                         <div class="form-group">
                             <label>Quantidade (unidades)</label>
-                            <input type="number" id="item-quantidade-medicamento" placeholder="Ex: 50" min="0" value="">
+                            <input type="number" id="item-quantidade-medicamento" placeholder="Ex: 50" min="0">
                         </div>
                         <div class="form-group">
                             <label>Quantidade mínima (alerta)</label>
-                            <input type="number" id="item-quantidade-minima" placeholder="Ex: 10" min="0" value="">
+                            <input type="number" id="item-quantidade-minima" placeholder="Ex: 10" min="0">
                         </div>
                         <div class="form-group">
                             <label>Data de Validade</label>
-                            <input type="date" id="item-validade" value="">
+                            <input type="date" id="item-validade">
                         </div>
                     </div>
                     
